@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    android:layout_margin="@dimen/registration_margin"
+    >
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/registration_name"
+        android:id="@+id/registration_name"
+        android:layout_margin="@dimen/registration_margin"/>
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/registration_phone"
+        android:inputType="phone"
+        android:id="@+id/registration_phone"
+        android:layout_below="@id/registration_name"
+        android:layout_margin="@dimen/registration_margin"/>
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/registration_password"
+        android:inputType="textPassword"
+        android:id="@+id/registration_password"
+        android:layout_below="@id/registration_phone"
+        android:layout_margin="@dimen/registration_margin"/>
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/registration_confirm_password"
+        android:inputType="textPassword"
+        android:id="@+id/registration_confirm_password"
+        android:layout_below="@id/registration_password"
+        android:layout_margin="@dimen/registration_margin"/>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/registration_address"
+        android:id="@+id/registration_address"
+        android:layout_below="@id/registration_confirm_password"
+        android:layout_margin="@dimen/registration_margin"/>
+
+    <RadioGroup
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/registration_radio_group"
+        android:layout_below="@id/registration_address"
+        android:orientation="horizontal"
+        android:layout_margin="@dimen/registration_margin"
+        android:layout_centerHorizontal="true">
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Consumer"
+            android:id="@+id/registration_consumer"
+            android:layout_margin="@dimen/registration_margin"
+            />
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Provider"
+            android:id="@+id/registration_provider"
+            android:layout_margin="@dimen/registration_margin"
+            />
+    </RadioGroup>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/registration_submit_button"
+        android:id="@+id/registration_submit"
+        android:layout_below="@id/registration_radio_group"
+        android:layout_margin="@dimen/registration_margin"/>
+
+</RelativeLayout>
