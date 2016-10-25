@@ -36,8 +36,8 @@ public class ActiveRequests extends Fragment {
         //  ListView
         arrayOfItems = new ArrayList<ListData>();
         //temporary add
-        for(int i =0; i<10;i++)
-            arrayOfItems.add(new ListData());
+        //for(int i =0; i<10;i++)
+          //  arrayOfItems.add(new ListData());
 
         RequestsAdapter adapter = new RequestsAdapter(getContext(), 0, arrayOfItems);
         requestsList.setAdapter(adapter);
