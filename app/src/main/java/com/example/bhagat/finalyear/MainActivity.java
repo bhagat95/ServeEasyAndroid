@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
         mtabs.setViewPager(mpager);
 
         //startActivity(new Intent(MainActivity.this,Registration.class));
-        startActivity(new Intent(MainActivity.this, NearbyServices.class));
+        //startActivity(new Intent(MainActivity.this, NearbyServices.class));
     }
 
     @Override

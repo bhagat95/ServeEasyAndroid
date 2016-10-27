@@ -6,8 +6,9 @@ package com.example.bhagat.finalyear;
 public class UserDetails {
     private static UserDetails ourInstance = new UserDetails();
 
-    String url = "http://192.168.109.41/";
-    String consumerId = "123";
+    public String url = "http://192.168.109.41/";
+    public String consumerId = "123";
+    public String providerId = "6";
 
     public static UserDetails getInstance() {
         return ourInstance;
