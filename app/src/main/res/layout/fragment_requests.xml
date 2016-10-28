@@ -8,9 +8,10 @@
     android:orientation="vertical"
     android:id="@+id/requests_fragment">
 
-    <include
+    <!-- toolbar is a part of activity and should not be included in fragment
+        include
         android:id="@+id/app_bar"
-        layout="@layout/app_bar" />
+        layout="@layout/app_bar" /-->
 
     <com.example.bhagat.finalyear.SlidingTabLayout
 

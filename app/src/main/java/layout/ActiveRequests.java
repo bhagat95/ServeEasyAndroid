@@ -76,7 +76,6 @@ public class ActiveRequests extends Fragment {
             }
         });
 
-
         return v;
 
     }
@@ -135,5 +134,4 @@ public class ActiveRequests extends Fragment {
         requestQueue.add(request);
 
     }
-
 }

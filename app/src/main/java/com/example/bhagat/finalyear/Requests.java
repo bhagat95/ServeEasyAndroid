@@ -11,18 +11,33 @@ import android.view.ViewGroup;
 
 public class Requests extends android.support.v4.app.Fragment {
 
-
     ViewPagerAdapter viewPagerAdapter;
 
     private SlidingTabLayout mtabs;
     private ViewPager mpager;
     private Toolbar toolbar;
 
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_requests, container, false);
+/*
+        View view = inflater.inflate(R.layout.fragment_requests, container, false);
+
+        viewPagerAdapter = new ViewPagerAdapter(getFragmentManager());
+        mpager = (ViewPager) view.findViewById(R.id.pager);
+        mpager.setAdapter(viewPagerAdapter);
+
+        //Assigning the sliding tab layout view
+        mtabs = (SlidingTabLayout) view.findViewById(R.id.tabs);
+        mtabs.setDistributeEvenly(true);
+
+
+        //  Setting the ViewPager For the SlidingTabsLayout
+        mtabs.setViewPager(mpager);
+
+        return view;
+*/
     }
 
 
@@ -35,7 +50,7 @@ public class Requests extends android.support.v4.app.Fragment {
         //setSupportActionBar(toolbar);
         //getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        viewPagerAdapter = new ViewPagerAdapter(getFragmentManager());
+        viewPagerAdapter = new ViewPagerAdapter(getChildFragmentManager());
         mpager = (ViewPager) getActivity().findViewById(R.id.pager);
         mpager.setAdapter(viewPagerAdapter);
 
@@ -90,6 +105,5 @@ public class Requests extends android.support.v4.app.Fragment {
 
         super.onDestroyView();
     }
-
 
 }

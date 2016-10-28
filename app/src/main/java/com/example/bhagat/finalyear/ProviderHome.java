@@ -41,7 +41,7 @@ public class ProviderHome extends AppCompatActivity {
         manager = getSupportFragmentManager();
         FragmentTransaction ft = manager.beginTransaction();//.detach(requestsFragment).attach(requestsFragment);
         ft.replace(R.id.dummy,requestsFragment);
-        ft.replace(R.id.dummy, new Requests());
+        //ft.replace(R.id.dummy, new Requests());
         ft.commit();
 
 
@@ -54,16 +54,16 @@ public class ProviderHome extends AppCompatActivity {
                 final int id = item.getItemId();
                 if (id == R.id.requests) {
                     FragmentTransaction ft = manager.beginTransaction();
-                    //ft.replace(R.id.dummy, requestsFragment);
+                    ft.replace(R.id.dummy, requestsFragment);
                     //ft.replace(R.id.dummy, new Requests());
-                    ft.replace(R.id.account_settings_fragment, requestsFragment);
+                    //ft.replace(R.id.account_settings_fragment, requestsFragment);
 
                     ft.commit();
 
                 } else if (id == R.id.settings) {
                     FragmentTransaction ft = manager.beginTransaction();
-                    //ft.replace(R.id.dummy, accountSettingsFragment);
-                    ft.replace(R.id.requests_fragment, accountSettingsFragment);
+                    ft.replace(R.id.dummy, accountSettingsFragment);
+                    //ft.replace(R.id.requests_fragment, accountSettingsFragment);
                     ft.commit();
                 }
                 /*
