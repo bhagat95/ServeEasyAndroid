@@ -36,7 +36,7 @@ import java.util.Map;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link PendingRequests.OnFragmentInteractionListener} interface
+ * {@link //PendingRequests.OnFragmentInteractionListener} interface
  * to handle interaction events.
  * Use the {@link PendingRequests#newInstance} factory method to
  * create an instance of this fragment.
