@@ -37,6 +37,10 @@ public class Login extends AppCompatActivity {
         //signup.setOnClickListener(this);
 
     }
+    
+    protected void rkj13(){
+        log.e("Error check ","yo man");   
+    }
 
 
 }
