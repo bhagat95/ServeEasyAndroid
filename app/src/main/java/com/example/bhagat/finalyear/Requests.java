@@ -107,3 +107,8 @@ public class Requests extends android.support.v4.app.Fragment {
     }
 
 }
+
+
+/*
+Please document the code properly
+*/
