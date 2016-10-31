@@ -155,3 +155,6 @@ public class Registration extends AppCompatActivity {
 
 //lawda
 
+/*
+Please check the register user name already exists
+*/
