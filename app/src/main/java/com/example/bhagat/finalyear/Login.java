@@ -19,19 +19,16 @@ public class Login extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
-
-        context = getApplicationContext();
-
+        context = getApplicationContext();        
+        
+        //finding widgets from layout
         username = (EditText) findViewById(R.id.username);
         password = (EditText) findViewById(R.id.password);
         signup = (TextView) findViewById(R.id.signup);
         skip = (TextView) findViewById(R.id.skip);
         login = (Button) findViewById(R.id.login);
         signup.setTextColor(getResources().getColor(android.R.color.holo_blue_dark));
-        skip.setTextColor(getResources().getColor(android.R.color.holo_blue_dark));
+        skip.setTextColor(getResources().getColor(android.R.color.holo_blue_dark))
 
         //signup.setVisibility(View.GONE);
 
@@ -39,6 +36,10 @@ public class Login extends AppCompatActivity {
         //skip.setOnClickListener(this);
         //signup.setOnClickListener(this);
 
+    }
+    
+    protected void rkj13(){
+        log.e("Error check ","yo man");   
     }
 
 
