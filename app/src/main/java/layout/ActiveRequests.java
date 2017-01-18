@@ -1,12 +1,19 @@
 package layout;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.util.SparseBooleanArray;
+import android.view.ActionMode;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -18,6 +25,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.bhagat.finalyear.ListData;
+import com.example.bhagat.finalyear.ProviderHome;
 import com.example.bhagat.finalyear.R;
 import com.example.bhagat.finalyear.RequestDetails;
 import com.example.bhagat.finalyear.RequestsAdapter;
@@ -38,6 +46,7 @@ public class ActiveRequests extends Fragment {
 
     ListView requestsList;
     ArrayList<ListData> arrayOfItems;
+    RequestsAdapter adapter;
 
     @Nullable
     @Override
@@ -56,25 +65,114 @@ public class ActiveRequests extends Fragment {
 
         getRequests();
 
-        RequestsAdapter adapter = new RequestsAdapter(getContext(), 0, arrayOfItems);
+        adapter = new RequestsAdapter(getContext(), 0, arrayOfItems);
         requestsList.setAdapter(adapter);
 
 
-//  To open the dialog for details
-/*
-        b.setOnClickListener(new View.OnClickListener() {
+        // define Choice mode for multiple  delete
+        requestsList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+        requestsList.setMultiChoiceModeListener(new  AbsListView.MultiChoiceModeListener() {
             @Override
-            public void onClick(View view) {
-                //showDetails();
+            public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
+                actionMode.getMenuInflater().inflate(R.menu.multiple_delete, menu);
+                return true;
             }
+
+            @Override
+            public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
+                return false;
+            }
+
+            @Override
+            public boolean onActionItemClicked(final ActionMode actionMode, MenuItem menuItem) {
+                switch (menuItem.getItemId()) {
+                    case R.id.selectAll:
+                        //
+                        final int checkedCount = arrayOfItems.size();
+                        // If item  is already selected or checked then remove or
+                        // unchecked  and again select all
+                        adapter.removeSelection();
+                        for (int i = 0; i < checkedCount; i++) {
+                            requestsList.setItemChecked(i, true);
+                            //  listviewadapter.toggleSelection(i);
+                        }
+                        // Set the  CAB title according to total checked items
+                        // Calls  toggleSelection method from ListViewAdapter Class
+                        // Count no.  of selected item and print it
+                        actionMode.setTitle(checkedCount + "  Selected");
+
+                        return true;
+
+                    case R.id.delete:
+                        // Add  dialog for confirmation to delete selected item record.
+                        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+
+                        builder.setMessage("Do you  want to delete selected record(s)?");
+
+
+                        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                // TODO  Auto-generated method stub
+                            }
+                        });
+
+                        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+
+                            public void onClick(DialogInterface dialog, int which) {
+
+                                // TODO  Auto-generated method stub
+
+                                SparseBooleanArray selected = adapter.getSelectedIds();
+                                for (int i = (selected.size() - 1); i >= 0; i--) {
+                                    if (selected.valueAt(i)) {
+                                        ListData selecteditem = adapter.getItem(selected.keyAt(i));
+                                        // Remove  selected items following the ids
+                                        adapter.remove(selecteditem);
+                                    }
+                                }
+                                // Close CAB
+                                actionMode.finish();
+                                selected.clear();
+                            }
+
+                        });
+
+                        AlertDialog alert = builder.create();
+
+                        alert.setIcon(R.drawable.ic_question_answer);// dialog  Icon
+
+                        alert.setTitle("Confirmation"); // dialog  Title
+
+                        alert.show();
+
+                        return true;
+
+                    default:
+                    return false;
+                }
+            }
+            @Override
+            public void onDestroyActionMode(ActionMode actionMode) {
+
+            }
+
+            @Override
+            public void onItemCheckedStateChanged(ActionMode actionMode, int i, long l, boolean b) {
+
+            }
+
         });
-*/
+
+        //  To open the dialog for details
         requestsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 showDetails(i);
             }
         });
+
 
         return v;
 

@@ -1,6 +1,7 @@
 package com.example.bhagat.finalyear;
 
 import android.content.Context;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,19 +19,20 @@ public class RequestsAdapter extends ArrayAdapter<ListData> {
 
     Context context;
     LayoutInflater mInflater;
-    List<ListData> objects ;
-    public RequestsAdapter(Context context, int resource, List<ListData> objects) {
-        super(context, resource, objects);
+    List<ListData> listOfItems;
+    private SparseBooleanArray mSelectedItemsIds;
+
+    public RequestsAdapter(Context context, int resource, List<ListData> listOfItems) {
+        super(context, resource, listOfItems);
         this.context = context;
-        this.objects = objects;
+        this.listOfItems = listOfItems;
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         //return super.getView(position, convertView, parent);
-        if(convertView == null)
-        {
+        if (convertView == null) {
             convertView = mInflater.inflate(R.layout.requests_adapter, parent, false);
         }
 
@@ -40,9 +42,9 @@ public class RequestsAdapter extends ArrayAdapter<ListData> {
         TextView quantity = (TextView) convertView.findViewById(R.id.quantity);
 
         try {
-            consumerName.setText(objects.get(position).jOb.getString("consumer_name"));
-            categoryName.setText(objects.get(position).jOb.getString("category_name"));
-            quantity.setText(objects.get(position).jOb.getString("quantity"));
+            consumerName.setText(listOfItems.get(position).jOb.getString("consumer_name"));
+            categoryName.setText(listOfItems.get(position).jOb.getString("category_name"));
+            quantity.setText(listOfItems.get(position).jOb.getString("quantity"));
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -50,5 +52,55 @@ public class RequestsAdapter extends ArrayAdapter<ListData> {
 
         return convertView;
     }
+
+
+    // for multiple select
+
+
+    @Override
+    public void remove(ListData object) {// int position){//
+        listOfItems.remove(object);
+        notifyDataSetChanged();
+    }
+
+
+    // get List after update or delete
+    public List<ListData> getMyList() {
+        return listOfItems;
+    }
+
+
+    public void toggleSelection(int position) {
+        selectView(position, !mSelectedItemsIds.get(position));
+    }
+
+    // Remove selection after unchecked
+    public void removeSelection() {
+        mSelectedItemsIds = new SparseBooleanArray();
+        notifyDataSetChanged();
+    }
+
+
+    // Item checked on selection
+
+    public void selectView(int position, boolean value) {
+        if (value)
+            mSelectedItemsIds.put(position, value);
+        else
+            mSelectedItemsIds.delete(position);
+        notifyDataSetChanged();
+    }
+
+
+    // Get number of selected item
+    public int getSelectedCount() {
+        return mSelectedItemsIds.size();
+    }
+
+
+    public SparseBooleanArray getSelectedIds() {
+        return mSelectedItemsIds;
+    }
+
 }
 
