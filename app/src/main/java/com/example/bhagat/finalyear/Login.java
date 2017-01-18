@@ -3,6 +3,7 @@ package com.example.bhagat.finalyear;
 import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -28,7 +29,7 @@ public class Login extends AppCompatActivity {
         skip = (TextView) findViewById(R.id.skip);
         login = (Button) findViewById(R.id.login);
         signup.setTextColor(getResources().getColor(android.R.color.holo_blue_dark));
-        skip.setTextColor(getResources().getColor(android.R.color.holo_blue_dark))
+        skip.setTextColor(getResources().getColor(android.R.color.holo_blue_dark));
 
         //signup.setVisibility(View.GONE);
 
@@ -39,7 +40,7 @@ public class Login extends AppCompatActivity {
     }
     
     protected void rkj13(){
-        log.e("Error check ","yo man");   
+        Log.e("Error check ","yo man");
     }
 
 
