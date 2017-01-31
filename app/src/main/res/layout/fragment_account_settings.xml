@@ -52,5 +52,13 @@
         android:layout_alignParentStart="true"
         android:layout_marginStart="25dp" />
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Update location"
+        android:id="@+id/updateLocation"
+        android:layout_above="@+id/buttonSave"
+        android:layout_alignStart="@+id/etservice_name" />
+
 
 </RelativeLayout>

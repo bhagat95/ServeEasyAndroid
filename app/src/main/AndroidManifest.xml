@@ -47,7 +47,11 @@
                 android:name="android.app.default_searchable"
                 android:value=".SearchResultsActivity" />
         </activity>
-        <activity android:name=".Login"></activity>
+        <activity android:name=".Login" />
+
+        <activity android:name=".ProviderTransactions">
+
+        </activity>
     </application>
 
 </manifest>

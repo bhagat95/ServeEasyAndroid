@@ -4,6 +4,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.util.SparseBooleanArray;
@@ -16,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -42,7 +44,7 @@ import java.util.Map;
 /**
  * Created by bhagat on 10/9/16.
  */
-public class ActiveRequests extends Fragment {
+public class ActiveRequests extends Fragment implements RequestDetails.RequestDialogResponse {
 
     ListView requestsList;
     ArrayList<ListData> arrayOfItems;
@@ -68,7 +70,165 @@ public class ActiveRequests extends Fragment {
         adapter = new RequestsAdapter(getContext(), 0, arrayOfItems);
         requestsList.setAdapter(adapter);
 
+        //  To open the dialog for details
+        requestsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
+                TextView consumerNameView = (TextView)view.findViewById(R.id.consumer);
+                String consumerName = consumerNameView.getText().toString();
+
+                TextView categoryNameView = (TextView)view.findViewById(R.id.category);
+                String categoryName = categoryNameView.getText().toString();
+
+                TextView distanceView = (TextView)view.findViewById(R.id.distance);
+                String distance = distanceView.getText().toString();
+
+                TextView quantityView = (TextView)view.findViewById(R.id.quantity);
+                String quantity = quantityView.getText().toString();
+
+                String request_id = "";
+
+                try {
+                    request_id = arrayOfItems.get(i).jOb.getString("request_id");
+                }
+                catch (Exception e){
+
+                }
+
+
+
+
+                showDetails(i,consumerName,categoryName,distance,quantity,request_id);
+
+                //showDetails(i);
+            }
+        });
+
+
+        return v;
+
+    }
+    /*private void showDetails(int position)
+    {
+        RequestDetails dialog = new RequestDetails();
+        dialog.show(getFragmentManager(), "dialogTag");
+    }*/
+    private void showDetails(int position,String consumerName,String categoryName,String distance, String quantity,String request_id) {
+
+        FragmentManager fm = getFragmentManager();
+        //RequestDetails dialog = new RequestDetails();//position,consumerName,categoryName,distance,quantity,request_id);
+
+        Bundle args = new Bundle();
+        args.putInt("position",position);
+        args.putString("consumerName",consumerName);
+        args.putString("categoryName",categoryName);
+        args.putString("quantity",quantity);
+        args.putString("distance",distance);
+        args.putString("request_id",request_id);
+
+        RequestDetails details = RequestDetails.newInstance();
+
+        int requestCode = 300;
+
+        details.setTargetFragment(this, 0);
+
+        //details.setArguments(args);
+
+        details.show(fm, "dialogTag");
+    }
+/*
+    void onRequestDecline(int position){
+        //notify server about decline
+        //add changes to transactions
+        arrayOfItems.remove(position);
+        adapter.notifyDataSetChanged();
+    }
+*/
+    void getRequests(){
+        RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
+
+        String url = UserDetails.getInstance().url + "fetch_requests.php";
+        //->GET REQUEST USING VOLLEY
+        StringRequest request = new StringRequest( Request.Method.POST, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.d("ActiveRequests response", response);
+                        try {
+                            JSONArray jsonArray = new JSONArray(response);
+
+                            for (int i = 0; i < response.length(); i++) {
+
+                                JSONObject jOb = jsonArray.getJSONObject(i);
+                                arrayOfItems.add(new ListData(jOb));
+                            }
+
+                            } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                        RequestsAdapter adapter = new RequestsAdapter(getActivity(), 0, arrayOfItems);
+                        requestsList.setAdapter(adapter);
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(getActivity(), error.getMessage(), Toast.LENGTH_LONG).show();
+                        Log.d("fetch_requests error",error.toString());
+                    }
+                }
+        )
+
+        {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("provider_id", UserDetails.getInstance().providerId);
+                params.put("type", "active");
+                //params.put("consumer_locy", "3");
+                return params;
+            }
+        } ;
+        requestQueue.add(request);
+
+    }
+
+    @Override
+    public void onDialogResponse(String response) {
+        if(response.equals("accept")){
+            Toast.makeText(getActivity(), "Accept ho gaya re bhai", Toast.LENGTH_SHORT).show();
+        }
+        else if (response.equals("decline")){
+            Toast.makeText(getActivity(), "lawde lelo", Toast.LENGTH_SHORT).show();
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//this is to multiple delete to be pasted in onCreateView
+/*
         // define Choice mode for multiple  delete
         requestsList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
         requestsList.setMultiChoiceModeListener(new  AbsListView.MultiChoiceModeListener() {
@@ -164,72 +324,4 @@ public class ActiveRequests extends Fragment {
             }
 
         });
-
-        //  To open the dialog for details
-        requestsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                showDetails(i);
-            }
-        });
-
-
-        return v;
-
-    }
-    private void showDetails(int position)
-    {
-        RequestDetails dialog = new RequestDetails();
-        dialog.show(getFragmentManager(), "dialogTag");
-    }
-
-    void getRequests(){
-        RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
-
-        String url = UserDetails.getInstance().url + "fetch_requests.php";
-        //->GET REQUEST USING VOLLEY
-        StringRequest request = new StringRequest( Request.Method.POST, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        Log.d("ActiveRequests response", response);
-                        try {
-                            JSONArray jsonArray = new JSONArray(response);
-
-                            for (int i = 0; i < response.length(); i++) {
-
-                                JSONObject jOb = jsonArray.getJSONObject(i);
-                                arrayOfItems.add(new ListData(jOb));
-                            }
-
-                            } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-
-                        RequestsAdapter adapter = new RequestsAdapter(getActivity(), 0, arrayOfItems);
-                        requestsList.setAdapter(adapter);
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(getActivity(), error.getMessage(), Toast.LENGTH_LONG).show();
-                        Log.d("fetch_requests error",error.toString());
-                    }
-                }
-        )
-
-        {
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<String, String>();
-                params.put("provider_id", UserDetails.getInstance().providerId);
-                params.put("type", "active");
-                //params.put("consumer_locy", "3");
-                return params;
-            }
-        } ;
-        requestQueue.add(request);
-
-    }
-}
+        */
