@@ -100,27 +100,34 @@ public class RequestDetails extends DialogFragment implements View.OnClickListen
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.request_details, null);
+
+        /*
+        TextView customerName, customerAddress, quantity;
+
+        customerName = (TextView) view.findViewById(R.id.customerName);
+        customerAddress = (TextView) view.findViewById(R.id.customerAddress);
+        quantity = (TextView) view.findViewById(R.id.quantity);
+        */
         accept = (Button) view.findViewById(R.id.accept);
         decline = (Button) view.findViewById(R.id.decline);
         accept.setOnClickListener(this);
+        decline.setOnClickListener(this);
   //      onAttachToParentFragment(getParentFragment());
 
-/*
         Bundle args = getArguments();
-        consumerName = getArguments().getString("consumerName");
+        consumerName = args.getString("consumerName");
         categoryName = args.getString("categoryName");
         distance = args.getString("distance");
         quantity = args.getString("quantity");
         request_id = args.getString("request_id");
-        //Toast.makeText(getActivity(),name,Toast.LENGTH_LONG).show();
-*/
+
+        ((TextView) view.findViewById(R.id.customerName) ).setText(consumerName);
+        ((TextView) view.findViewById(R.id.customerAddress) ).setText("ADDRESS MISSING");
+        ((TextView) view.findViewById(R.id.category) ).setText(categoryName);
+        ((TextView) view.findViewById(R.id.quantity) ).setText(quantity);
+
         //to remove dialog when click outside of it
-
-
-
         //setCancelable(true);
-
-
 
         return view;//inflater.inflate(R.layout.request_details, null);
     }

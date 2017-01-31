@@ -48,7 +48,6 @@
             android:id="@+id/quantity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/category"
             android:layout_margin="@dimen/request_dialog_margin"
             android:text="quantity"
             android:textSize="@dimen/request_dialog_text_size"

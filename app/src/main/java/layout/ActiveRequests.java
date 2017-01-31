@@ -117,7 +117,6 @@ public class ActiveRequests extends Fragment implements RequestDetails.RequestDi
     private void showDetails(int position,String consumerName,String categoryName,String distance, String quantity,String request_id) {
 
         FragmentManager fm = getFragmentManager();
-        //RequestDetails dialog = new RequestDetails();//position,consumerName,categoryName,distance,quantity,request_id);
 
         Bundle args = new Bundle();
         args.putInt("position",position);
@@ -128,15 +127,22 @@ public class ActiveRequests extends Fragment implements RequestDetails.RequestDi
         args.putString("request_id",request_id);
 
         RequestDetails details = RequestDetails.newInstance();
-
-        int requestCode = 300;
-
         details.setTargetFragment(this, 0);
-
-        //details.setArguments(args);
+        details.setArguments(args);
 
         details.show(fm, "dialogTag");
     }
+
+    @Override
+    public void onDialogResponse(String response) {
+        if(response.equals("accept")){
+            Toast.makeText(getActivity(), "Accept ho gaya re bhai", Toast.LENGTH_SHORT).show();
+        }
+        else if (response.equals("decline")){
+            Toast.makeText(getActivity(), "lawde lelo", Toast.LENGTH_SHORT).show();
+        }
+    }
+
 /*
     void onRequestDecline(int position){
         //notify server about decline
@@ -195,15 +201,7 @@ public class ActiveRequests extends Fragment implements RequestDetails.RequestDi
 
     }
 
-    @Override
-    public void onDialogResponse(String response) {
-        if(response.equals("accept")){
-            Toast.makeText(getActivity(), "Accept ho gaya re bhai", Toast.LENGTH_SHORT).show();
-        }
-        else if (response.equals("decline")){
-            Toast.makeText(getActivity(), "lawde lelo", Toast.LENGTH_SHORT).show();
-        }
-    }
+
 }
 
 
