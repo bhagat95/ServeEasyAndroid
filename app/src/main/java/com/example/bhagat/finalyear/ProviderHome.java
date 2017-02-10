@@ -12,19 +12,22 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 
 public class ProviderHome extends AppCompatActivity {
     DrawerLayout dlayout;
     ActionBarDrawerToggle toggle;
     FragmentManager manager;
-
+    ProviderTransactions providerTransactionsFragment;
     Requests requestsFragment;
     AccountSettings accountSettingsFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
         setContentView(R.layout.activity_provider_home);
         Toolbar toolbar = (Toolbar) findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);
@@ -33,6 +36,7 @@ public class ProviderHome extends AppCompatActivity {
         }
         dlayout = (DrawerLayout) findViewById(R.id.mydrawerlayout);
         requestsFragment = new Requests();
+        providerTransactionsFragment = new ProviderTransactions();
         accountSettingsFragment = new AccountSettings();
         toggle = new ActionBarDrawerToggle(this, dlayout, 0, 0);
         dlayout.addDrawerListener(toggle);
@@ -66,6 +70,13 @@ public class ProviderHome extends AppCompatActivity {
                     //ft.replace(R.id.requests_fragment, accountSettingsFragment);
                     ft.commit();
                 }
+                //Todo: conditional statement to check if ProviderTransactions or ConsumerTransactions
+                else if (id == R.id.transactions) {
+                    FragmentTransaction ft = manager.beginTransaction();
+                    ft.replace(R.id.dummy, providerTransactionsFragment);
+                    //ft.replace(R.id.requests_fragment, accountSettingsFragment);
+                    ft.commit();
+                }
                 /*
                 else if (id == R.id.logout) {
                     //    backgrnd_frag_is_home = false;
@@ -83,6 +94,23 @@ public class ProviderHome extends AppCompatActivity {
                 return true;
             }
         });
+
+
+
+
+        try {
+            //temporary service testing
+            startService(new Intent(this, ProviderBackgroundService.class));
+        }
+        catch (Exception e) {
+            Log.e("startService",e.toString());
+        }
+
+
+
+
+
+
     }
 
 

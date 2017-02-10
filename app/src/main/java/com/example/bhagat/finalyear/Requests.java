@@ -58,10 +58,26 @@ public class Requests extends android.support.v4.app.Fragment {
         mtabs = (SlidingTabLayout) getActivity().findViewById(R.id.tabs);
         mtabs.setDistributeEvenly(true);
 
-
         //  Setting the ViewPager For the SlidingTabsLayout
         mtabs.setViewPager(mpager);
+/*
+        mpager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                viewPagerAdapter.notifyDataSetChanged();
+            }
 
+            @Override
+            public void onPageSelected(int position) {
+
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+*/
     }
 /*
     @Override

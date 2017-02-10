@@ -24,16 +24,23 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textStyle="bold"
-                android:text="shashank"
+                android:text="consumer_name"
                 android:layout_alignParentTop="true"/>
+
+            <TextView
+                android:id="@+id/category_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="category"
+                android:layout_below="@+id/consumer_name"/>
 
             <TextView
                 android:id="@+id/status"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:text="delivered"
-                android:layout_below="@+id/consumer_name"/>
+                android:text="status"
+                android:layout_below="@+id/category_name"/>
         </RelativeLayout>
     </android.support.v7.widget.CardView>
 

@@ -48,10 +48,18 @@
                 android:value=".SearchResultsActivity" />
         </activity>
         <activity android:name=".Login" />
+        <activity android:name=".ProviderTransactions"/>
 
-        <activity android:name=".ProviderTransactions">
 
-        </activity>
+        <service
+            android:name=".ProviderBackgroundService"
+            android:enabled="true"
+            android:exported="true"/>
+
+        <service
+            android:name=".ConsumerBackgroundService"
+            android:enabled="true"
+            android:exported="true"/>
     </application>
 
 </manifest>

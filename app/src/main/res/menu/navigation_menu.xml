@@ -13,6 +13,11 @@
             android:icon="@drawable/requests">
         </item>
         <item
+            android:id="@+id/transactions"
+            android:title="Transactions"
+            android:icon="@drawable/ic_action_calendar_day"
+            />
+        <item
             android:id="@+id/settings"
             android:title="Settings"
             android:icon="@drawable/settings">

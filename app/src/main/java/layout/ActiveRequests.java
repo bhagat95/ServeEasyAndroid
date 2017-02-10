@@ -49,6 +49,7 @@ public class ActiveRequests extends Fragment implements RequestDetails.RequestDi
     ListView requestsList;
     ArrayList<ListData> arrayOfItems;
     RequestsAdapter adapter;
+    String request_id = "";
 
     @Nullable
     @Override
@@ -63,7 +64,6 @@ public class ActiveRequests extends Fragment implements RequestDetails.RequestDi
         //temporary add
         //for(int i =0; i<10;i++)
         //  arrayOfItems.add(new ListData());
-        arrayOfItems = new ArrayList<ListData>();
 
         getRequests();
 
@@ -87,17 +87,12 @@ public class ActiveRequests extends Fragment implements RequestDetails.RequestDi
                 TextView quantityView = (TextView)view.findViewById(R.id.quantity);
                 String quantity = quantityView.getText().toString();
 
-                String request_id = "";
-
                 try {
                     request_id = arrayOfItems.get(i).jOb.getString("request_id");
                 }
                 catch (Exception e){
 
                 }
-
-
-
 
                 showDetails(i,consumerName,categoryName,distance,quantity,request_id);
 
@@ -109,6 +104,8 @@ public class ActiveRequests extends Fragment implements RequestDetails.RequestDi
         return v;
 
     }
+
+
     /*private void showDetails(int position)
     {
         RequestDetails dialog = new RequestDetails();
@@ -125,6 +122,7 @@ public class ActiveRequests extends Fragment implements RequestDetails.RequestDi
         args.putString("quantity",quantity);
         args.putString("distance",distance);
         args.putString("request_id",request_id);
+        args.putInt("listItemPosition", position);
 
         RequestDetails details = RequestDetails.newInstance();
         details.setTargetFragment(this, 0);
@@ -134,12 +132,23 @@ public class ActiveRequests extends Fragment implements RequestDetails.RequestDi
     }
 
     @Override
-    public void onDialogResponse(String response) {
+    public void onDialogResponse(String response, int position) {
         if(response.equals("accept")){
             Toast.makeText(getActivity(), "Accept ho gaya re bhai", Toast.LENGTH_SHORT).show();
+            makeRequestStatusPending();
+            arrayOfItems.remove(position);
+            requestsList.invalidateViews();
         }
         else if (response.equals("decline")){
-            Toast.makeText(getActivity(), "lawde lelo", Toast.LENGTH_SHORT).show();
+            //adapter.remove(adapter.getItem(position));
+            Log.d("listSize", arrayOfItems.size()+"");
+            //adapter.remove(adapter.getItem(position));
+
+            arrayOfItems.remove(position);
+            requestsList.invalidateViews();
+            //adapter.notifyDataSetChanged();
+            Log.d("newListSize", arrayOfItems.size()+"");
+            Toast.makeText(getActivity(), "serverUpdate "+position+arrayOfItems.size(), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -148,9 +157,44 @@ public class ActiveRequests extends Fragment implements RequestDetails.RequestDi
         //notify server about decline
         //add changes to transactions
         arrayOfItems.remove(position);
-        adapter.notifyDataSetChanged();
+        notifyDataSetChanged();
     }
 */
+
+
+
+    public void makeRequestStatusPending(){
+        RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
+        String url = UserDetails.getInstance().url + "update_request_status.php";
+        StringRequest request = new StringRequest( Request.Method.POST, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.d("markRequestPending", response);
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(getActivity(), error.getMessage(), Toast.LENGTH_LONG).show();
+                        Log.d("markRequestSeen error",error.toString());
+                    }
+                }
+        )
+        {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("status","2");
+                params.put("request_id",request_id);
+                return params;
+            }
+        };
+        requestQueue.add(request);
+    }
+
+
+
     void getRequests(){
         RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
 
@@ -164,7 +208,7 @@ public class ActiveRequests extends Fragment implements RequestDetails.RequestDi
                         try {
                             JSONArray jsonArray = new JSONArray(response);
 
-                            for (int i = 0; i < response.length(); i++) {
+                            for (int i = 0; i < jsonArray.length(); i++) {
 
                                 JSONObject jOb = jsonArray.getJSONObject(i);
                                 arrayOfItems.add(new ListData(jOb));
@@ -173,7 +217,7 @@ public class ActiveRequests extends Fragment implements RequestDetails.RequestDi
                             } catch (JSONException e) {
                             e.printStackTrace();
                         }
-
+//todo duplicacy in instance of RequestAdapter
                         RequestsAdapter adapter = new RequestsAdapter(getActivity(), 0, arrayOfItems);
                         requestsList.setAdapter(adapter);
                     }
@@ -181,7 +225,6 @@ public class ActiveRequests extends Fragment implements RequestDetails.RequestDi
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(getActivity(), error.getMessage(), Toast.LENGTH_LONG).show();
                         Log.d("fetch_requests error",error.toString());
                     }
                 }

@@ -25,6 +25,7 @@ import android.widget.Toast;
 public class RequestDetails extends DialogFragment implements View.OnClickListener{
 
     String consumerName, categoryName, distance, quantity, request_id;
+    Integer listItemPosition;
     Button accept, decline;
     //RequestDialogResponse requestDialogResponse;
 
@@ -38,37 +39,47 @@ public class RequestDetails extends DialogFragment implements View.OnClickListen
 
     @Override
     public void onClick(View view) {
-        Log.d("Accept", "clicked");
 
         if(view.getId() == R.id.accept) {
             Log.d("Accept", "clicked");
             onAccept();
         }
+        else if(view.getId() == R.id.decline){
+            Log.d("Decline", "clicked");
+            onDecline();
+        }
 
     }
 
     public void onAccept(){
-        Log.d("onAccept", "called" + getTargetFragment());
+        Log.d("onAccept", "called");
         Toast.makeText(getActivity(), "Dabaya re bhai", Toast.LENGTH_SHORT).show();
-
         try {
             RequestDialogResponse requestDialogResponseListener = (RequestDialogResponse)getTargetFragment();
-
-            requestDialogResponseListener.onDialogResponse("accept");
-            //requestDialogResponse.onDialogResponse("accept");
+            requestDialogResponseListener.onDialogResponse("accept", listItemPosition);
         }
         catch(Exception e)
         {
             Log.e("onAcceptError", e.toString());
         }
-
-
-
+        dismiss();
+    }
+    public void onDecline(){
+        Log.d("onDecline", "called");
+        Toast.makeText(getActivity(), "Dabaya re bhai", Toast.LENGTH_SHORT).show();
+        try {
+            RequestDialogResponse requestDialogResponseListener = (RequestDialogResponse)getTargetFragment();
+            requestDialogResponseListener.onDialogResponse("decline", listItemPosition);
+        }
+        catch(Exception e)
+        {
+            Log.e("onDeclinetError", e.toString());
+        }
         dismiss();
     }
 
     public interface RequestDialogResponse{
-        void onDialogResponse(String response);
+        void onDialogResponse(String response, int position);
     }
 
 
@@ -120,6 +131,7 @@ public class RequestDetails extends DialogFragment implements View.OnClickListen
         distance = args.getString("distance");
         quantity = args.getString("quantity");
         request_id = args.getString("request_id");
+        listItemPosition = args.getInt("listItemPosition");
 
         ((TextView) view.findViewById(R.id.customerName) ).setText(consumerName);
         ((TextView) view.findViewById(R.id.customerAddress) ).setText("ADDRESS MISSING");

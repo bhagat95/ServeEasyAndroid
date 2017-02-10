@@ -3,6 +3,7 @@ package com.example.bhagat.finalyear;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 
 import layout.ActiveRequests;
 import layout.PendingRequests;
@@ -10,7 +11,7 @@ import layout.PendingRequests;
 /**
  * Created by bhagat on 10/9/16.
  */
-public class ViewPagerAdapter extends FragmentPagerAdapter {
+public class ViewPagerAdapter extends FragmentStatePagerAdapter {
 
     int numberOfTabs = 2;
     String [] title = {"Active", "Pending"};
@@ -22,6 +23,11 @@ public class ViewPagerAdapter extends FragmentPagerAdapter {
     @Override
     public Fragment getItem(int position) {
         return position==0 ? new ActiveRequests() : new PendingRequests();
+    }
+
+    @Override
+    public int getItemPosition(Object object) {
+        return POSITION_NONE;//super.getItemPosition(object);
     }
 
     @Override

@@ -16,12 +16,12 @@ import java.util.ArrayList;
 public class ProviderTransactionsAdapter extends RecyclerView
         .Adapter<ProviderTransactionsAdapter.DataObjectHolder> {
 
-    public ArrayList<String> listOfItems;
+    public ArrayList<ListData> arrayOfItems;
 
     public static MyClickListener myClickListener;
 
-    public ProviderTransactionsAdapter(Context context, int resource, ArrayList<String> listOfItems) { //ListData
-        this.listOfItems = listOfItems;
+    public ProviderTransactionsAdapter(Context context, int resource, ArrayList<ListData> listOfItems) { //ListData
+        this.arrayOfItems = listOfItems;
     }
 
     @Override
@@ -35,8 +35,14 @@ public class ProviderTransactionsAdapter extends RecyclerView
 
     @Override
     public void onBindViewHolder(DataObjectHolder holder, int position) {
-        holder.consumerName.setText("launda"+position);//listOfItems.get(position).getmText1());
-        holder.status.setText("delivered"+position);//listOfItems.get(position).getmText2());
+        try {
+            holder.consumerName.setText(arrayOfItems.get(position).jOb.getString("consumer_name"));
+            holder.categoryName.setText(arrayOfItems.get(position).jOb.getString("category_name"));
+            holder.status.setText(arrayOfItems.get(position).jOb.getString("status"));
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     public void setOnItemClickListener(MyClickListener myClickListener) {
@@ -49,17 +55,14 @@ public class ProviderTransactionsAdapter extends RecyclerView
 
     @Override
     public int getItemCount() {
-        return listOfItems.size();
+        return arrayOfItems == null ? 0 : arrayOfItems.size();
     }
-
-
-
 
 
     public static class DataObjectHolder extends RecyclerView.ViewHolder
             implements View
             .OnClickListener {
-        TextView consumerName;
+        TextView consumerName, categoryName;
         TextView status;
 
         public DataObjectHolder(View itemView) {

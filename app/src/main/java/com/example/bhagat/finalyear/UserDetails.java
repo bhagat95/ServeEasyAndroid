@@ -8,7 +8,8 @@ public class UserDetails {
 
     public String url = "http://192.168.109.41/";
     public String consumerId = "123";
-    public String providerId = "6";
+    public String providerId = "500";
+    public boolean isProvider = true;
 
     public static UserDetails getInstance() {
         return ourInstance;
