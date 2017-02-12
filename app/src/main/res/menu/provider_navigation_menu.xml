@@ -8,22 +8,22 @@
             app:actionLayout="@layout/layout_switch"
             />
         <item
-            android:id="@+id/requests"
+            android:id="@+id/provider_requests"
             android:title="Requests"
             android:icon="@drawable/requests">
         </item>
         <item
-            android:id="@+id/transactions"
+            android:id="@+id/provider_transactions"
             android:title="Transactions"
             android:icon="@drawable/ic_action_calendar_day"
             />
         <item
-            android:id="@+id/settings"
+            android:id="@+id/provider_settings"
             android:title="Settings"
             android:icon="@drawable/settings">
         </item>
         <item
-            android:id="@+id/logout"
+            android:id="@+id/provider_logout"
             android:title="Log Out"
             android:icon="@drawable/logout">
         </item>

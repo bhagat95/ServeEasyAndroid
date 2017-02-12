@@ -9,6 +9,8 @@ public class UserDetails {
     public String url = "http://192.168.109.41/";
     public String consumerId = "123";
     public String providerId = "500";
+    public String userName = "Bhosad";
+    public String userID = "1";
     public boolean isProvider = true;
 
     public static UserDetails getInstance() {
