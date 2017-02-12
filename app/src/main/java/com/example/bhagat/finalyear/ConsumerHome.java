@@ -50,7 +50,6 @@ public class ConsumerHome extends AppCompatActivity {
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         final SharedPreferences.Editor editor = sharedPreferences.edit();
-
         manager = getSupportFragmentManager();
         FragmentTransaction ft = manager.beginTransaction();//.detach(requestsFragment).attach(requestsFragment);
         ft.replace(R.id.dummy_consumer,nearbyServicesFragment);
