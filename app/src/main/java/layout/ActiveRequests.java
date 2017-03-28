@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.util.SparseBooleanArray;
@@ -32,6 +33,7 @@ import com.example.bhagat.finalyear.R;
 import com.example.bhagat.finalyear.RequestDetails;
 import com.example.bhagat.finalyear.RequestsAdapter;
 import com.example.bhagat.finalyear.UserDetails;
+import com.example.bhagat.finalyear.VolleyNetworkManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -44,32 +46,24 @@ import java.util.Map;
 /**
  * Created by bhagat on 10/9/16.
  */
-public class ActiveRequests extends Fragment implements RequestDetails.RequestDialogResponse {
+public class ActiveRequests extends Fragment implements RequestDetails.RequestDialogResponse,SwipeRefreshLayout.OnRefreshListener {
 
     ListView requestsList;
     ArrayList<ListData> arrayOfItems;
     RequestsAdapter adapter;
-    String request_id = "";
+    String request_id = "",consumerAddress;
+    SwipeRefreshLayout swipeRefreshLayout;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        //return super.onCreateView(inflater, container, savedInstanceState);
         View v = inflater.inflate(R.layout.fragment_active_requests, container, false);
-
         requestsList = (ListView) v.findViewById(R.id.list);
-
-        //  ListView
-        arrayOfItems = new ArrayList<ListData>();
-        //temporary add
-        //for(int i =0; i<10;i++)
-        //  arrayOfItems.add(new ListData());
-
-        getRequests();
-
-        adapter = new RequestsAdapter(getContext(), 0, arrayOfItems);
+        arrayOfItems = new ArrayList<>();
+        //getRequests();
+        //the two lines below can be removed
+        adapter = new RequestsAdapter(getContext(),0,  arrayOfItems);
         requestsList.setAdapter(adapter);
-
         //  To open the dialog for details
         requestsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -81,28 +75,35 @@ public class ActiveRequests extends Fragment implements RequestDetails.RequestDi
                 TextView categoryNameView = (TextView)view.findViewById(R.id.category);
                 String categoryName = categoryNameView.getText().toString();
 
+                //todo: distance is to be calculated (Eucledean/distance-matrix)
+
                 TextView distanceView = (TextView)view.findViewById(R.id.distance);
                 String distance = distanceView.getText().toString();
 
                 TextView quantityView = (TextView)view.findViewById(R.id.quantity);
                 String quantity = quantityView.getText().toString();
-
                 try {
                     request_id = arrayOfItems.get(i).jOb.getString("request_id");
+                    consumerAddress = arrayOfItems.get(i).jOb.getString("address");
                 }
                 catch (Exception e){
-
                 }
-
-                showDetails(i,consumerName,categoryName,distance,quantity,request_id);
-
-                //showDetails(i);
+                showDetails(i,consumerName,categoryName,distance,quantity,request_id,consumerAddress);
             }
         });
 
+        swipeRefreshLayout = (SwipeRefreshLayout)v.findViewById(R.id.swipe_refresh_layout);
+        swipeRefreshLayout.setOnRefreshListener(this);
 
+        swipeRefreshLayout.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        swipeRefreshLayout.setRefreshing(true);
+                                        getRequests();
+                                    }
+                                }
+        );
         return v;
-
     }
 
 
@@ -111,258 +112,97 @@ public class ActiveRequests extends Fragment implements RequestDetails.RequestDi
         RequestDetails dialog = new RequestDetails();
         dialog.show(getFragmentManager(), "dialogTag");
     }*/
-    private void showDetails(int position,String consumerName,String categoryName,String distance, String quantity,String request_id) {
-
+    private void showDetails(int position,String consumerName,String categoryName,String distance, String quantity,String request_id,String address) {
         FragmentManager fm = getFragmentManager();
-
         Bundle args = new Bundle();
-        args.putInt("position",position);
         args.putString("consumerName",consumerName);
         args.putString("categoryName",categoryName);
         args.putString("quantity",quantity);
         args.putString("distance",distance);
         args.putString("request_id",request_id);
+        args.putString("address",address);
         args.putInt("listItemPosition", position);
-
         RequestDetails details = RequestDetails.newInstance();
         details.setTargetFragment(this, 0);
         details.setArguments(args);
-
-        details.show(fm, "dialogTag");
+        details.show(fm, "activeDialogTag");
     }
+
 
     @Override
     public void onDialogResponse(String response, int position) {
         if(response.equals("accept")){
-            Toast.makeText(getActivity(), "Accept ho gaya re bhai", Toast.LENGTH_SHORT).show();
             makeRequestStatusPending();
             arrayOfItems.remove(position);
             requestsList.invalidateViews();
         }
         else if (response.equals("decline")){
-            //adapter.remove(adapter.getItem(position));
-            Log.d("listSize", arrayOfItems.size()+"");
-            //adapter.remove(adapter.getItem(position));
-
+            makeRequestStatusCancelled();
             arrayOfItems.remove(position);
             requestsList.invalidateViews();
-            //adapter.notifyDataSetChanged();
-            Log.d("newListSize", arrayOfItems.size()+"");
-            Toast.makeText(getActivity(), "serverUpdate "+position+arrayOfItems.size(), Toast.LENGTH_SHORT).show();
         }
     }
 
-/*
-    void onRequestDecline(int position){
-        //notify server about decline
-        //add changes to transactions
-        arrayOfItems.remove(position);
-        notifyDataSetChanged();
-    }
-*/
-
-
-
     public void makeRequestStatusPending(){
-        RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
+        Map<String, String> params = new HashMap<>();
+        params.put("status","2");
+        params.put("request_id",request_id);
         String url = UserDetails.getInstance().url + "update_request_status.php";
-        StringRequest request = new StringRequest( Request.Method.POST, url,
-                new Response.Listener<String>() {
+        VolleyNetworkManager.getInstance(getContext()).makeRequest(params, url,
+                new VolleyNetworkManager.Callback() {
                     @Override
-                    public void onResponse(String response) {
-                        Log.d("markRequestPending", response);
+                    public void onSuccess(String response) {
+                        Log.d("makeStatusCancelled",response);
                     }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(getActivity(), error.getMessage(), Toast.LENGTH_LONG).show();
-                        Log.d("markRequestSeen error",error.toString());
-                    }
-                }
-        )
-        {
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<String, String>();
-                params.put("status","2");
-                params.put("request_id",request_id);
-                return params;
-            }
-        };
-        requestQueue.add(request);
+                });
     }
 
+
+    void makeRequestStatusCancelled(){
+        Map<String, String> params = new HashMap<>();
+        params.put("status","4");
+        params.put("request_id",request_id);
+        String url = UserDetails.getInstance().url + "update_request_status.php";
+        VolleyNetworkManager.getInstance(getContext()).makeRequest(params, url,
+                new VolleyNetworkManager.Callback() {
+                    @Override
+                    public void onSuccess(String response) {
+                        Log.d("makeStatusCancelled",response);
+                    }
+                });
+    }
+
+    @Override
+    public void onRefresh() {
+        getRequests();
+    }
 
 
     void getRequests(){
-        RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
-
+        swipeRefreshLayout.setRefreshing(true);
+        Map<String, String> params = new HashMap<>();
+        params.put("provider_id", UserDetails.getInstance().providerId);
+        params.put("type","active");
         String url = UserDetails.getInstance().url + "fetch_requests.php";
-        //->GET REQUEST USING VOLLEY
-        StringRequest request = new StringRequest( Request.Method.POST, url,
-                new Response.Listener<String>() {
+        VolleyNetworkManager.getInstance(getContext()).makeRequest(params, url,
+                new VolleyNetworkManager.Callback() {
                     @Override
-                    public void onResponse(String response) {
+                    public void onSuccess(String response) {
                         Log.d("ActiveRequests response", response);
                         try {
+                            if(arrayOfItems!=null)
+                                arrayOfItems.clear();
                             JSONArray jsonArray = new JSONArray(response);
-
                             for (int i = 0; i < jsonArray.length(); i++) {
-
                                 JSONObject jOb = jsonArray.getJSONObject(i);
                                 arrayOfItems.add(new ListData(jOb));
                             }
-
-                            } catch (JSONException e) {
+                            adapter.notifyDataSetChanged();
+                            swipeRefreshLayout.setRefreshing(false);
+                        } catch (JSONException e) {
                             e.printStackTrace();
                         }
-//todo duplicacy in instance of RequestAdapter
-                        RequestsAdapter adapter = new RequestsAdapter(getActivity(), 0, arrayOfItems);
-                        requestsList.setAdapter(adapter);
                     }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.d("fetch_requests error",error.toString());
-                    }
-                }
-        )
-
-        {
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<String, String>();
-                params.put("provider_id", UserDetails.getInstance().providerId);
-                params.put("type", "active");
-                //params.put("consumer_locy", "3");
-                return params;
-            }
-        } ;
-        requestQueue.add(request);
-
+                });
     }
-
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//this is to multiple delete to be pasted in onCreateView
-/*
-        // define Choice mode for multiple  delete
-        requestsList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
-        requestsList.setMultiChoiceModeListener(new  AbsListView.MultiChoiceModeListener() {
-            @Override
-            public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
-                actionMode.getMenuInflater().inflate(R.menu.multiple_delete, menu);
-                return true;
-            }
-
-            @Override
-            public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
-                return false;
-            }
-
-            @Override
-            public boolean onActionItemClicked(final ActionMode actionMode, MenuItem menuItem) {
-                switch (menuItem.getItemId()) {
-                    case R.id.selectAll:
-                        //
-                        final int checkedCount = arrayOfItems.size();
-                        // If item  is already selected or checked then remove or
-                        // unchecked  and again select all
-                        adapter.removeSelection();
-                        for (int i = 0; i < checkedCount; i++) {
-                            requestsList.setItemChecked(i, true);
-                            //  listviewadapter.toggleSelection(i);
-                        }
-                        // Set the  CAB title according to total checked items
-                        // Calls  toggleSelection method from ListViewAdapter Class
-                        // Count no.  of selected item and print it
-                        actionMode.setTitle(checkedCount + "  Selected");
-
-                        return true;
-
-                    case R.id.delete:
-                        // Add  dialog for confirmation to delete selected item record.
-                        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-
-                        builder.setMessage("Do you  want to delete selected record(s)?");
-
-
-                        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                // TODO  Auto-generated method stub
-                            }
-                        });
-
-                        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                            @Override
-
-                            public void onClick(DialogInterface dialog, int which) {
-
-                                // TODO  Auto-generated method stub
-
-                                SparseBooleanArray selected = adapter.getSelectedIds();
-                                for (int i = (selected.size() - 1); i >= 0; i--) {
-                                    if (selected.valueAt(i)) {
-                                        ListData selecteditem = adapter.getItem(selected.keyAt(i));
-                                        // Remove  selected items following the ids
-                                        adapter.remove(selecteditem);
-                                    }
-                                }
-                                // Close CAB
-                                actionMode.finish();
-                                selected.clear();
-                            }
-
-                        });
-
-                        AlertDialog alert = builder.create();
-
-                        alert.setIcon(R.drawable.ic_question_answer);// dialog  Icon
-
-                        alert.setTitle("Confirmation"); // dialog  Title
-
-                        alert.show();
-
-                        return true;
-
-                    default:
-                    return false;
-                }
-            }
-            @Override
-            public void onDestroyActionMode(ActionMode actionMode) {
-
-            }
-
-            @Override
-            public void onItemCheckedStateChanged(ActionMode actionMode, int i, long l, boolean b) {
-
-            }
-
-        });
-        */

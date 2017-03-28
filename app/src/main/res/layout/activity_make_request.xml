@@ -3,73 +3,46 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.bhagat.finalyear.MakeRequest">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="New Text"
-        android:id="@+id/service_name"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:textSize="@dimen/make_request_text_size"/>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="New Text"
-        android:id="@+id/provider_name"
-        android:layout_below="@id/service_name"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="@dimen/make_request_margin"
-        android:textSize="@dimen/make_request_text_size"/>
+    <include
+        layout="@layout/app_bar"
+        android:id="@+id/app_bar">
+    </include>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_below="@id/provider_name"
-        android:gravity="center_horizontal"
-        android:layout_marginTop="@dimen/make_request_margin"
-        android:id="@+id/call_provider_layout">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Contact number"
-            android:id="@+id/provider_phone"
-            android:textSize="@dimen/make_request_text_size"/>
 
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:contentDescription="@string/call_button"
-            android:src="@drawable/ic_call"
-            android:id="@+id/call_button"
-            />
 
-    </LinearLayout>
 
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_below="@id/call_provider_layout"
         android:gravity="center_horizontal"
-        android:layout_marginTop="@dimen/make_request_margin"
-        android:id="@+id/select_date_layout">
+        android:layout_marginTop="56dp"
+        android:id="@+id/select_date_layout"
+        android:layout_below="@+id/call_provider_layout"
+        android:layout_alignParentStart="true">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Due date"
+            android:text="Due date:"
             android:id="@+id/pick_date"
+            android:layout_marginRight="60dp"
+            android:layout_gravity="center_vertical"
             android:textSize="@dimen/make_request_text_size"/>
+
+
+        <TextView
+            android:text="Select date"
+            android:layout_gravity="center_vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/select_date"
+            android:layout_marginRight="50dp"/>
 
         <ImageButton
             android:layout_width="wrap_content"
@@ -78,8 +51,8 @@
             android:src="@drawable/ic_action_calendar_day"
             android:id="@+id/pick_date_button"
             />
-
     </LinearLayout>
+
 
     <Spinner
         android:layout_width="match_parent"
@@ -89,15 +62,16 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="@dimen/make_request_margin" />
 
+
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_below="@id/select_category"
         android:gravity="center_horizontal"
-        android:layout_marginTop="@dimen/make_request_margin"
-        android:id="@+id/linearLayout2">
-
+        android:id="@+id/linearLayout2"
+        android:layout_alignTop="@+id/select_category"
+        android:layout_alignParentStart="true">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -111,17 +85,88 @@
             android:inputType="number"
             android:ems="2"
             android:id="@+id/quantity"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_horizontal"
+        android:layout_marginTop="30dp"
+        android:id="@+id/call_provider_layout"
+        android:layout_below="@+id/provider_name"
+        android:layout_alignParentStart="true">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Contact number"
+            android:layout_gravity="center_vertical"
+            android:id="@+id/provider_phno"
+            android:textSize="@dimen/make_request_text_size"/>
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/call_button"
+            android:src="@drawable/ic_call"
+            android:id="@+id/call_button"
+            />
 
     </LinearLayout>
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Service Name"
+        android:id="@+id/service_name"
+        android:textSize="@dimen/make_request_text_size"
+        android:layout_marginTop="14dp"
+        android:layout_below="@+id/app_bar"
+        android:layout_alignStart="@+id/provider_name" />
+
+    <TextView
+        android:layout_centerHorizontal="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Provider Name"
+        android:id="@+id/provider_name"
+        android:layout_marginTop="41dp"
+        android:textSize="@dimen/make_request_text_size"
+        android:layout_below="@+id/service_name"
+        />
+
     <Button
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Submit"
         android:id="@+id/submit"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="27dp"
+        android:layout_below="@+id/address"
+        android:layout_alignEnd="@+id/service_name" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="textPersonName"
+        android:ems="10"
+        android:id="@+id/address"
+        android:hint="Type your address here"
+        android:layout_marginEnd="50dp"
         android:layout_below="@+id/linearLayout2"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="@dimen/make_request_margin" />
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="16dp" />
+
+    <TextView
+        android:text="Address: "
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/address"
+        android:layout_toStartOf="@+id/address"
+        android:layout_marginEnd="11dp"
+        android:layout_marginBottom="11dp"
+        android:id="@+id/textView" />
 
 
 </RelativeLayout>

@@ -53,6 +53,7 @@ public class Login extends AppCompatActivity {
         signup = (TextView) findViewById(R.id.signup);
         login = (Button) findViewById(R.id.login);
         provider = (RadioButton) findViewById(R.id.login_provider);
+
         signup.setTextColor(getResources().getColor(android.R.color.holo_blue_dark));
         arrayOfItems = new ArrayList<>();
         signup.setOnClickListener(new View.OnClickListener() {
@@ -65,13 +66,15 @@ public class Login extends AppCompatActivity {
         sp = PreferenceManager.getDefaultSharedPreferences(this);
         editor  = sp.edit();
         loggdedIn = sp.getBoolean("loggedin", false);
+
         /*This is used to keep the user logged in when the next time the user opens the app*/
         if (loggdedIn) {
-            String userType = sp.getString("userType", "guest");
+            String userType = sp.getString("userType","guest");
             if (userType.equals("provider")) {
+                editor.putString("username",UserDetails.getInstance().userName);
                 startActivity(new Intent(this, ProviderHome.class));
             } else {
-                startActivity(new Intent(this, NearbyServices.class));
+                startActivity(new Intent(this, ConsumerHome.class));
             }
             finish();
         }
@@ -110,30 +113,47 @@ public class Login extends AppCompatActivity {
                         Log.d("login response", response);
                         try {
                             JSONArray jsonArray = new JSONArray(response);
-
                             if(jsonArray.length() == 0){
                                 Toast.makeText(Login.this, "Incorrect login credentials. Try again.", Toast.LENGTH_LONG).show();
                             }
-
                             for (int i = 0; i < jsonArray.length(); i++) {
                                 JSONObject jOb = jsonArray.getJSONObject(i);
                                 arrayOfItems.add(new ListData(jOb));
                                 String user_name = arrayOfItems.get(i).jOb.getString("user_name");
                                 String user_id = arrayOfItems.get(i).jOb.getString("user_id");
+
+                                if(provider.isChecked()) {
+                                    String isAvailable = arrayOfItems.get(i).jOb.getString("available");
+                                    boolean available ;
+                                    if(isAvailable.equals("1")){
+                                        available = true;
+                                    }
+                                    else{
+                                        available = false;
+                                    }
+                                    editor.putBoolean("available",available);
+                                    editor.commit();
+                                }
+
                                 int row_count = arrayOfItems.get(i).jOb.getInt("row_count");
                                 if (row_count != 1) {
                                     logInSuccessful = false;
                                     Toast.makeText(Login.this, "Incorrect login credentials. Try again.", Toast.LENGTH_LONG).show();
                                 } else {
+                                    editor.putString("username",user_name);
+                                    editor.commit();
                                     UserDetails.getInstance().userName = user_name;
-                                    UserDetails.getInstance().userID = user_id;
+                                    UserDetails.getInstance().userId = user_id;
+                                    UserDetails.getInstance().consumerId = user_id;
+                                    UserDetails.getInstance().providerId = user_id;
+                                    UserDetails.getInstance().isProvider = true;
                                     if (provider.isChecked()) {
                                         userType = "provider";
                                     } else {
                                         userType = "consumer";
                                     }
                                     logInSuccessful = true;
-                                    Toast.makeText(Login.this, "Login credentials correct", Toast.LENGTH_LONG).show();
+                                    Toast.makeText(Login.this, "Login credentials correct" + UserDetails.getInstance().consumerId, Toast.LENGTH_LONG).show();
                                     editor.putBoolean("loggedin", true);
                                     editor.commit();
                                     if (userType.equals("provider")) {
@@ -164,7 +184,7 @@ public class Login extends AppCompatActivity {
         ) {
             @Override
             protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<String, String>();
+                Map<String, String> params = new HashMap<>();
                 params.put("user_type", (provider.isChecked() ? "provider" : "consumer"));
                 params.put("mobile_no", mobileNo.getText().toString());
                 params.put("password", password.getText().toString());

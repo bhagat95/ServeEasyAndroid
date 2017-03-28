@@ -21,8 +21,8 @@ public class ConsumerTransactionsAdapter extends RecyclerView.Adapter<ConsumerTr
 
     public static MyClickListener myClickListener;
 
-    public ConsumerTransactionsAdapter(Context context, int resource, ArrayList<ListData> listOfItems) { //ListData
-        //super(context, attrs);
+    public ConsumerTransactionsAdapter( ArrayList<ListData> listOfItems) { //ListData
+
         this.arrayOfItems = listOfItems;
     }
 
@@ -38,9 +38,13 @@ public class ConsumerTransactionsAdapter extends RecyclerView.Adapter<ConsumerTr
     @Override
     public void onBindViewHolder(DataObjectHolder holder, int position) {
         try {
-            holder.consumerName.setText(arrayOfItems.get(position).jOb.getString("consumer_name"));
+            holder.providerName.setText(arrayOfItems.get(position).jOb.getString("provider_name"));
             holder.categoryName.setText(arrayOfItems.get(position).jOb.getString("category_name"));
+            holder.quantity.setText("Qty: "+ arrayOfItems.get(position).jOb.getString("quantity"));
             holder.status.setText(arrayOfItems.get(position).jOb.getString("status"));
+            holder.date.setText(arrayOfItems.get(position).jOb.getString("date"));
+            Log.d("transactions_quant", arrayOfItems.get(position).jOb.getString("quantity"));
+
         }
         catch (Exception e){
             e.printStackTrace();
@@ -64,13 +68,16 @@ public class ConsumerTransactionsAdapter extends RecyclerView.Adapter<ConsumerTr
     public static class DataObjectHolder extends RecyclerView.ViewHolder
             implements View
             .OnClickListener {
-        TextView consumerName, categoryName;
-        TextView status;
+        TextView providerName, categoryName, quantity;
+        TextView status,date;
 
         public DataObjectHolder(View itemView) {
             super(itemView);
-            consumerName = (TextView) itemView.findViewById(R.id.consumer_name);
+            providerName = (TextView) itemView.findViewById(R.id.provider_name);
+            categoryName = (TextView) itemView.findViewById(R.id.category_name);
+            quantity = (TextView) itemView.findViewById(R.id.quantity);
             status = (TextView) itemView.findViewById(R.id.status);
+            date = (TextView) itemView.findViewById(R.id.date);
             Log.i("LOG_TAG", "Adding Listener");
             itemView.setOnClickListener(this);
         }
@@ -78,7 +85,7 @@ public class ConsumerTransactionsAdapter extends RecyclerView.Adapter<ConsumerTr
 
         @Override
         public void onClick(View v) {
-            myClickListener.onItemClick(getAdapterPosition(), v);
+         //   myClickListener.onItemClick(getAdapterPosition(), v);
         }
     }
 

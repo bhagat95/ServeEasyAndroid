@@ -37,7 +37,7 @@ public class ProviderBackgroundService extends Service {
     NotificationCompat.Builder notification;
     private static int notificationID;
     BackgroundService backgroundService;
-
+    boolean isRunning = false;
     @Override
     public void onCreate() {
         //what's the use of calling super?
@@ -47,7 +47,6 @@ public class ProviderBackgroundService extends Service {
         created (before it calls either onStartCommand() or onBind()). If the service is already running,
         this method is not called.
          */
-
         backgroundService = new BackgroundService();
 
         requestQueue = Volley.newRequestQueue(getApplicationContext());
@@ -66,12 +65,9 @@ public class ProviderBackgroundService extends Service {
         notification.setWhen(System.currentTimeMillis());
         notification.setContentTitle(categoryName);
         notification.setContentText(consumerName+" requested for "+quantity+" "+categoryName);
-
-        Intent intent = (UserDetails.getInstance().isProvider) ?
-                new Intent(this, ProviderHome.class) : new Intent(this, NearbyServices.class);
+        Intent intent = new Intent(this, ProviderHome.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         notification.setContentIntent(pendingIntent);
-
         //Builds notification and issues it
         NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         nm.notify(notificationID, notification.build());
@@ -83,43 +79,11 @@ public class ProviderBackgroundService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         //Toast.makeText(this, "service starting", Toast.LENGTH_SHORT).show();
         Log.d("ProviderService", "started");
-
-
-
         if (!backgroundService.isRunning()) {
             backgroundService.start();
-            backgroundService.isRunning = true;
+            isRunning = true;
         }
         return super.onStartCommand(intent, flags, startId);
-
-/*
-
-        try {
-            int count = 0;
-            for (int i = 0; i < 10; i++) {
-                //Thread.sleep(6000);
-                Log.d("service thread count", "" + count);
-                count++;
-
-                new Handler().postDelayed(new Runnable() {
-                    public void run() {
-                        fetchNotifications();
-                    }
-                }, 6000);
-
-//                fetchNotifications();
-
-            }
-        } catch (Exception e) {
-            // Restore interrupt status.
-            Thread.currentThread().interrupt();
-        }
-*/
-
-
-        // If we get killed, after returning from here, restart
-        //return START_STICKY;
-        //return super.onStartCommand(intent, flags, startId);
     }
 
 
@@ -127,18 +91,18 @@ public class ProviderBackgroundService extends Service {
 
 
     class BackgroundService extends Thread {
-        public boolean isRunning = false;
+
         public long TIME_GAP = 6000;
-        //        Handler networkRequest= new Handler();
+        // Handler networkRequest= new Handler();
         Runnable runTask = new Runnable() {
             int count = 0;
             @Override
             public void run() {
                 isRunning = true;
-                while (count<40) {
+                while (isRunning) {
                     count++;
                     try {
-                        Log.d("BackgroundServiceCount", count+"");
+                        Log.d("PBackgroundServiceCount", count+"");
                         fetchNotifications();
                         Thread.sleep(TIME_GAP);
                     } catch (InterruptedException e) {
@@ -148,11 +112,9 @@ public class ProviderBackgroundService extends Service {
                 }
             }
         };
-
         public boolean isRunning() {
             return isRunning;
         }
-
         @Override
         public void run() {
             super.run();
@@ -160,15 +122,8 @@ public class ProviderBackgroundService extends Service {
         }
     }
 
-
-
-
-
-
-
     public void fetchNotifications(){
-
-        String url = UserDetails.getInstance().url + "fetch_notifications.php";
+        String url = UserDetails.getInstance().url + "fetch_provider_notifications.php";
         StringRequest request = new StringRequest( Request.Method.POST, url,
                 new Response.Listener<String>() {
                     @Override
@@ -176,9 +131,7 @@ public class ProviderBackgroundService extends Service {
                         Log.d("ProviderServiceResponse", response);
                         try {
                             JSONArray jsonArray = new JSONArray(response);
-
                             for (int i = 0; i < jsonArray.length(); i++) {
-
                                 JSONObject jOb = jsonArray.getJSONObject(i);
                                 //arrayOfItems.add(new ListData(jOb));
                                 markRequestSeen(jOb);
@@ -203,9 +156,8 @@ public class ProviderBackgroundService extends Service {
         {
             @Override
             protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<String, String>();
+                Map<String, String> params = new HashMap<>();
                 params.put("provider_id", UserDetails.getInstance().providerId);
-                //params.put("consumer_locy", "3");
                 return params;
             }
         } ;
@@ -214,9 +166,7 @@ public class ProviderBackgroundService extends Service {
     }
 
     public void markRequestSeen(final JSONObject jOb){
-
         String url = UserDetails.getInstance().url + "mark_request_seen.php";
-
         String temp=null;
         try{
             temp = jOb.getString("request_id");
@@ -224,21 +174,16 @@ public class ProviderBackgroundService extends Service {
             Log.e("markRequestSeenID",e.toString());
         }
         final String requestID = temp;
-
         StringRequest request = new StringRequest( Request.Method.POST, url,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
                         Log.d("markRequestSeenResponse", response);
-
                         try{
                             generateNotifications(jOb.getString("category_name"),
                                     jOb.getString("consumer_name"),
                                     jOb.getString("quantity"));
-
                             notificationID++;
-
-
                         }
                         catch (Exception e){
                             Log.e("generateNotifJSON",e.toString());
@@ -259,6 +204,7 @@ public class ProviderBackgroundService extends Service {
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
                 params.put("request_id",requestID);
+                params.put("seen_val","1");
                 return params;
             }
         } ;
@@ -269,19 +215,24 @@ public class ProviderBackgroundService extends Service {
 
     @Override
     public void onDestroy() {
+            Log.d("destroy_pservice","Provider Service Destroyed");
+            backgroundService.interrupt();
+            isRunning = false;
+            backgroundService = null;
         super.onDestroy();
         /*
         The system invokes this method when the service is no longer used and is being destroyed.
         Your service should implement this to clean up any resources such as threads, registered listeners,
         or receivers. This is the last call that the service receives.
          */
-        if (backgroundService.isRunning) {
-            backgroundService.interrupt();
-            backgroundService.isRunning = false;
-            backgroundService = null;
-        }
+
     }
 
+    @Override
+    public boolean stopService(Intent name) {
+        isRunning = false;
+        return super.stopService(name);
+    }
 
     @Nullable
     @Override

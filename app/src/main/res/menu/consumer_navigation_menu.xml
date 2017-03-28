@@ -5,17 +5,17 @@
         <item
             android:id="@+id/nearby_services"
             android:title="Nearby Services"
-            android:icon="@drawable/requests">
+            android:icon="@drawable/ic_notifications_black_24dp">
         </item>
         <item
             android:id="@+id/consumer_transactions"
             android:title="Transactions"
-            android:icon="@drawable/ic_action_calendar_day"
+            android:icon="@drawable/ic_receipt_black_24dp"
             />
         <item
             android:id="@+id/consumer_settings"
             android:title="Settings"
-            android:icon="@drawable/settings">
+            android:icon="@drawable/ic_settings_black_24dp">
         </item>
         <item
             android:id="@+id/consumer_logout"

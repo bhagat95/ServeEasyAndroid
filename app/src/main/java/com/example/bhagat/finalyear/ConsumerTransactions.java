@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -20,15 +21,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link ConsumerTransactions.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link ConsumerTransactions#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class ConsumerTransactions extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -93,42 +85,37 @@ public class ConsumerTransactions extends Fragment {
         myRecyclerView.setHasFixedSize(true);
         myLayoutManager = new LinearLayoutManager(getContext());
         myRecyclerView.setLayoutManager(myLayoutManager);
-        arrayOfItems = new ArrayList<ListData>();
+        arrayOfItems = new ArrayList<>();
 
         getDataSet();
 
-        myAdapter = new ProviderTransactionsAdapter(getContext(), 0, arrayOfItems);
-        myRecyclerView.setAdapter(myAdapter);
+        //myAdapter = new ConsumerTransactionsAdapter(arrayOfItems);
+        //myRecyclerView.setAdapter(myAdapter);
 
     }
 
 
     void getDataSet() {
-
-        Map<String, String> params = new HashMap<String, String>();
-        params.put("provider_id",UserDetails.getInstance().providerId);
+        Map<String, String> params = new HashMap<>();
+        params.put("consumer_id",UserDetails.getInstance().consumerId);
+        Toast.makeText(getActivity(),UserDetails.getInstance().consumerId+"",Toast.LENGTH_LONG).show();
+        String url = UserDetails.getInstance().url + "fetch_consumer_transactions.php";
         VolleyNetworkManager.getInstance(getContext()).makeRequest(params,
-                "fetch_provider_transactions.php", new VolleyNetworkManager.Callback() {
+                url, new VolleyNetworkManager.Callback() {
                     @Override
                     public void onSuccess(String response) {
-
-                        Log.d("ProviderTransactions", response);
+                        Log.d("ConsumerTransactions", response);
                         try {
                             JSONArray jsonArray = new JSONArray(response);
-
                             for (int i = 0; i < jsonArray.length(); i++) {
-
                                 JSONObject jOb = jsonArray.getJSONObject(i);
                                 arrayOfItems.add(new ListData(jOb));
                             }
-
-                            myAdapter = new ProviderTransactionsAdapter(getContext(), 0, arrayOfItems);
+                            myAdapter = new ConsumerTransactionsAdapter(arrayOfItems);
                             myRecyclerView.setAdapter(myAdapter);
-
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-
                     }
                 });
 
@@ -137,14 +124,12 @@ public class ConsumerTransactions extends Fragment {
 
 
 /*
-
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);
         }
     }
-
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -155,13 +140,11 @@ public class ConsumerTransactions extends Fragment {
                     + " must implement OnFragmentInteractionListener");
         }
     }
-
     @Override
     public void onDetach() {
         super.onDetach();
         mListener = null;
     }
-
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
@@ -171,7 +154,6 @@ public class ConsumerTransactions extends Fragment {
      * See the Android Training lesson <a href=
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
-
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);

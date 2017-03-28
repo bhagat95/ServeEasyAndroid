@@ -40,7 +40,7 @@ public class NearbyServicesAdapter extends ArrayAdapter<ListData>{
         try {
             serviceName.setText(objects.get(position).jOb.getString("service_name"));
             providerName.setText(objects.get(position).jOb.getString("provider_name"));
-            //distance.setText(objects.get(position).jOb.getString("distance"));
+            distance.setText(objects.get(position).jOb.getString("distance") + "km");
         } catch (JSONException e) {
             e.printStackTrace();
         }

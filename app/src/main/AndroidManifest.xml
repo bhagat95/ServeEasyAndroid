@@ -15,40 +15,54 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:screenOrientation="portrait"
             android:name=".SearchResultsActivity"
             android:label="@string/title_activity_search_results"
             android:launchMode="singleTop"
             android:theme="@style/AppTheme">
-
             <!-- android:launchMode="singleTop" it launches the new Activity in the same one without increasing the stack -->
-
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
-
             <meta-data
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
         </activity>
-        <activity android:name=".Registration" />
-        <activity android:name=".MakeRequest" />
+        <activity android:name=".Registration"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ConsumerHome" />
+        </activity>
+        <activity android:name=".MakeRequest"
+            android:screenOrientation="portrait">
+
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ConsumerHome" />
+        </activity>
 
         <!-- android:windowSoftInputMode="adjustPan"  Prevents keyboard from pushing widgets upward -->
         <activity
             android:name=".ProviderHome"
-            android:windowSoftInputMode="adjustPan">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-
+            android:windowSoftInputMode="adjustPan"
+            android:screenOrientation="portrait">
             <!-- This is to tell the activity where to find the searchable configuration -->
             <meta-data
                 android:name="android.app.default_searchable"
                 android:value=".SearchResultsActivity" />
         </activity>
-        <activity android:name=".Login" />
+        <activity android:name=".Login"
+            android:screenOrientation="portrait">
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
+        </activity>
 
+        <activity android:name=".ConsumerHome"
+            android:screenOrientation="portrait">
+        </activity>
         <service
             android:name=".ProviderBackgroundService"
             android:enabled="true"
@@ -57,10 +71,6 @@
             android:name=".ConsumerBackgroundService"
             android:enabled="true"
             android:exported="true" />
-
-        <activity android:name=".ConsumerHome">
-
-        </activity>
     </application>
 
 </manifest>

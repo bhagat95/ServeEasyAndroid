@@ -44,11 +44,9 @@ public class NearbyServices extends Fragment implements ActivityCompat.OnRequest
     RequestQueue requestQueue;
     ListView requestsList;
     ArrayList<ListData> arrayOfItems;
-
     private LocationManager locationManager;
     private static final long MIN_TIME = 400;
     private static final float MIN_DISTANCE = 1000;
-    private int PROXIMITY_RADIUS = 10000;
     double latitude,longitude;
 
     @Nullable
@@ -64,7 +62,7 @@ public class NearbyServices extends Fragment implements ActivityCompat.OnRequest
         super.onActivityCreated(savedInstanceState);
         requestsList = (ListView) getActivity().findViewById(R.id.list);
         //  ListView
-        arrayOfItems = new ArrayList<ListData>();
+        arrayOfItems = new ArrayList<>();
 
         getLocation();
         getServices();
@@ -72,11 +70,11 @@ public class NearbyServices extends Fragment implements ActivityCompat.OnRequest
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 try {
-
                     startActivity(new Intent(getActivity(), MakeRequest.class).
                             putExtra("serviceId", arrayOfItems.get(i).jOb.getString("service_id"))
                             .putExtra("serviceName",arrayOfItems.get(i).jOb.getString("service_name"))
                             .putExtra("providerName",arrayOfItems.get(i).jOb.getString("provider_name"))
+                            .putExtra("distance",arrayOfItems.get(i).jOb.getString("distance"))
                             .putExtra("providerPhno",arrayOfItems.get(i).jOb.getString("provider_phno")));
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -86,25 +84,17 @@ public class NearbyServices extends Fragment implements ActivityCompat.OnRequest
 
     }
     LocationListener locationListener = new LocationListener(){
-
         @Override
         public void onLocationChanged(Location location) {
-
         }
-
         @Override
         public void onStatusChanged(String s, int i, Bundle bundle) {
-
         }
-
         @Override
         public void onProviderEnabled(String s) {
-
         }
-
         @Override
         public void onProviderDisabled(String s) {
-
         }
     };
 
@@ -120,20 +110,20 @@ public class NearbyServices extends Fragment implements ActivityCompat.OnRequest
             ;
         }
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME, MIN_DISTANCE,
-               locationListener );
+                locationListener );
     }
 
 
     ///volley
     void getServices() {
-        requestQueue = Volley.newRequestQueue(getActivity());
-
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("consumer_locx", latitude + "");
+        params.put("consumer_locy", longitude + "");
         String url = UserDetails.getInstance().url + "fetch_services.php";
-        //->GET REQUEST USING VOLLEY
-        StringRequest request = new StringRequest( Request.Method.POST, url,
-                new Response.Listener<String>() {
+        VolleyNetworkManager.getInstance(getContext()).makeRequest(params,
+                url, new VolleyNetworkManager.Callback() {
                     @Override
-                    public void onResponse(String response) {
+                    public void onSuccess(String response) {
                         try{
                             Log.d("services",response);
                             JSONArray jsonArray = new JSONArray(response);
@@ -145,30 +135,10 @@ public class NearbyServices extends Fragment implements ActivityCompat.OnRequest
                         catch (Exception e){
                             e.printStackTrace();
                         }
-
                         NearbyServicesAdapter adapter = new NearbyServicesAdapter(getActivity(), 0, arrayOfItems);
                         requestsList.setAdapter(adapter);
                     }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(getActivity(), error.getMessage(), Toast.LENGTH_LONG).show();
-                        Log.d("fetch_services error",error.toString());
-                    }
-                }
-        )
-        {
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<String, String>();
-                params.put("consumer_locx", latitude + "");
-                params.put("consumer_locy", longitude + "");
-                return params;
-            }
-        };
-        request.setRetryPolicy(new DefaultRetryPolicy(20 * 1000, 2, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        requestQueue.add(request);
+                });
     }
 
     @Override
@@ -188,22 +158,20 @@ public class NearbyServices extends Fragment implements ActivityCompat.OnRequest
         //LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
         latitude = location.getLatitude();
         longitude = location.getLongitude();
+        UserDetails.getInstance().latitude = latitude+"";
+        UserDetails.getInstance().longitude = longitude+"";
         Log.d("Longitude", longitude + " ");
         latitude = location.getLatitude();
         Log.d("Latitude", latitude + " ");
     }
-
     @Override
     public void onStatusChanged(String s, int i, Bundle bundle) {
     }
-
     @Override
     public void onProviderEnabled(String s) {
     }
-
     @Override
     public void onProviderDisabled(String s) {
     }
 
 }
-

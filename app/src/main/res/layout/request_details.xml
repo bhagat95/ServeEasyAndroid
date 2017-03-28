@@ -65,25 +65,25 @@
         android:layout_margin="@dimen/request_dialog_margin"
         android:gravity="center_horizontal">
 
-    <Button
-        android:id="@+id/accept"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/request_dialog_margin"
-        android:text="Accept"
-        android:textSize="@dimen/request_dialog_text_size"
-        />
+        <Button
+            android:id="@+id/accept"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/request_dialog_margin"
+            android:text="Accept"
+            android:textSize="@dimen/request_dialog_text_size"
+            />
 
-    <Button
-        android:id="@+id/decline"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/category"
-        android:layout_margin="@dimen/request_dialog_margin"
-        android:text="Decline"
-        android:textSize="@dimen/request_dialog_text_size"
-        />
-</LinearLayout>
+        <Button
+            android:id="@+id/decline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/category"
+            android:layout_margin="@dimen/request_dialog_margin"
+            android:text="Decline"
+            android:textSize="@dimen/request_dialog_text_size"
+            />
+    </LinearLayout>
 
 
 

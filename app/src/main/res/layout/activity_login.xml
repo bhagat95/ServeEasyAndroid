@@ -3,7 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.example.bhagat.finalyear.Login">
+    tools:context="com.example.bhagat.finalyear.Login"
+    >
 
     <include
         layout="@layout/app_bar"
@@ -11,6 +12,9 @@
     </include>
 
     <EditText
+        android:textColor="@android:color/white"
+
+
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/mobile_no"
@@ -21,6 +25,7 @@
         android:hint="Mobile no"/>
 
     <EditText
+        android:textColor="@android:color/white"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="textPassword"
@@ -40,6 +45,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="20dp">
         <RadioButton
+
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Consumer"

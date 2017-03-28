@@ -7,8 +7,7 @@ import org.json.JSONObject;
  */
 public class ListData {
     public JSONObject jOb;
-    public ListData(JSONObject jOb)
-    {
+    public ListData(JSONObject jOb) {
         this.jOb = jOb;
     }
 }

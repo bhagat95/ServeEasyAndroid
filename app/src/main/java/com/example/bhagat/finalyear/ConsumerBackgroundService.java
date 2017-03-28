@@ -1,5 +1,6 @@
 package com.example.bhagat.finalyear;
 
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -25,16 +26,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ConsumerBackgroundService extends Service {
-    public ConsumerBackgroundService() {
-    }
-
-
 
     RequestQueue requestQueue;
     NotificationCompat.Builder notification;
     private static int notificationID;
     BackgroundService backgroundService;
-
+    boolean isRunning = false;
     @Override
     public void onCreate() {
         //what's the use of calling super?
@@ -55,20 +52,16 @@ public class ConsumerBackgroundService extends Service {
     }
 
 
-    public void generateNotifications(String categoryName, String consumerName, String quantity){
+    public void generateAcceptedNotifications(String categoryName, String consumerName, String quantity){
         //Build the notification
-        int requestCount = 2;
         notification.setSmallIcon(R.drawable.person);
         notification.setTicker("New request");
         notification.setWhen(System.currentTimeMillis());
         notification.setContentTitle(categoryName);
-        notification.setContentText(consumerName+" requested for "+quantity+" "+categoryName);
-
-        Intent intent = (UserDetails.getInstance().isProvider) ?
-                new Intent(this, ProviderHome.class) : new Intent(this, NearbyServices.class);
+        notification.setContentText("Your following request has been accepted by the provder:" + consumerName+" requested for "+quantity+" "+categoryName);
+        Intent intent = new Intent(this, NearbyServices.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         notification.setContentIntent(pendingIntent);
-
         //Builds notification and issues it
         NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         nm.notify(notificationID, notification.build());
@@ -76,22 +69,33 @@ public class ConsumerBackgroundService extends Service {
     }
 
 
+    public void generateCancelledNotifications(String categoryName, String consumerName, String quantity){
+        //Build the notification
+        notification.setSmallIcon(R.drawable.person);
+        notification.setTicker("New request");
+        notification.setWhen(System.currentTimeMillis());
+        notification.setContentTitle(categoryName);
+        notification.setContentText("Sorry your following request has been cancelled by the provder:" + "You requested for "+quantity+" "+categoryName);
+
+        Intent intent = new Intent(this, NearbyServices.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        notification.setContentIntent(pendingIntent);
+        //Builds notification and issues it
+        NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        nm.notify(notificationID, notification.build());
+
+    }
+
+
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        //Toast.makeText(this, "service starting", Toast.LENGTH_SHORT).show();
-        Log.d("ProviderService", "started");
-
-
-
+        Log.d("ConsumerService", "started");
         if (!backgroundService.isRunning()) {
             backgroundService.start();
-            backgroundService.isRunning = true;
+            isRunning = true;
         }
         return super.onStartCommand(intent, flags, startId);
-
-        // If we get killed, after returning from here, restart
-        //return START_STICKY;
-        //return super.onStartCommand(intent, flags, startId);
     }
 
 
@@ -99,18 +103,18 @@ public class ConsumerBackgroundService extends Service {
 
 
     class BackgroundService extends Thread {
-        public boolean isRunning = false;
-        public long TIME_GAP = 6000;
+
+        public long TIME_GAP = 3000;
         //        Handler networkRequest= new Handler();
         Runnable runTask = new Runnable() {
             int count = 0;
             @Override
             public void run() {
                 isRunning = true;
-                while (count<40) {
+                while (isRunning) {
                     count++;
                     try {
-                        Log.d("BackgroundServiceCount", count+"");
+                        Log.d("CBackgroundServiceCount", count+"");
                         fetchNotifications();
                         Thread.sleep(TIME_GAP);
                     } catch (InterruptedException e) {
@@ -137,10 +141,8 @@ public class ConsumerBackgroundService extends Service {
 
 
 
-
     public void fetchNotifications(){
-
-        String url = UserDetails.getInstance().url + "fetch_notifications.php";
+        String url = UserDetails.getInstance().url + "fetch_consumer_notifications.php";
         StringRequest request = new StringRequest( Request.Method.POST, url,
                 new Response.Listener<String>() {
                     @Override
@@ -148,15 +150,13 @@ public class ConsumerBackgroundService extends Service {
                         Log.d("ConsumerServiceResponse", response);
                         try {
                             JSONArray jsonArray = new JSONArray(response);
-
                             for (int i = 0; i < jsonArray.length(); i++) {
-
                                 JSONObject jOb = jsonArray.getJSONObject(i);
                                 //arrayOfItems.add(new ListData(jOb));
-                                markRequestSeen(jOb);
+                                String seen_val = jOb.getString("seen");
+                                markRequestSeen(jOb,seen_val);
                                 //category_name, quantity, consumer_name, category_name
                             }
-
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -171,13 +171,11 @@ public class ConsumerBackgroundService extends Service {
                     }
                 }
         )
-
         {
             @Override
             protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<String, String>();
+                Map<String, String> params = new HashMap<>();
                 params.put("consumer_id", UserDetails.getInstance().consumerId);
-                //params.put("consumer_locy", "3");
                 return params;
             }
         } ;
@@ -185,10 +183,9 @@ public class ConsumerBackgroundService extends Service {
 
     }
 
-    public void markRequestSeen(final JSONObject jOb){
+    public void markRequestSeen(final JSONObject jOb, final String seenVal){
 
         String url = UserDetails.getInstance().url + "mark_request_seen.php";
-
         String temp=null;
         try{
             temp = jOb.getString("request_id");
@@ -202,15 +199,16 @@ public class ConsumerBackgroundService extends Service {
                     @Override
                     public void onResponse(String response) {
                         Log.d("markRequestSeenResponse", response);
-
                         try{
-                            generateNotifications(jOb.getString("category_name"),
-                                    jOb.getString("consumer_name"),
-                                    jOb.getString("quantity"));
-
+                            if(seenVal.equals("2"))
+                                generateAcceptedNotifications(jOb.getString("category_name"),
+                                        jOb.getString("consumer_name"),
+                                        jOb.getString("quantity"));
+                            else
+                                generateCancelledNotifications(jOb.getString("category_name"),
+                                        jOb.getString("consumer_name"),
+                                        jOb.getString("quantity"));
                             notificationID++;
-
-
                         }
                         catch (Exception e){
                             Log.e("generateNotifJSON",e.toString());
@@ -231,6 +229,7 @@ public class ConsumerBackgroundService extends Service {
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
                 params.put("request_id",requestID);
+                params.put("seen_val",(Integer.parseInt(seenVal) + 1) + "");
                 return params;
             }
         } ;
@@ -241,34 +240,34 @@ public class ConsumerBackgroundService extends Service {
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
+
         /*
         The system invokes this method when the service is no longer used and is being destroyed.
         Your service should implement this to clean up any resources such as threads, registered listeners,
         or receivers. This is the last call that the service receives.
          */
-        if (backgroundService.isRunning) {
+            Log.d("destroy_cservice","Consumer Service Destroyed");
             backgroundService.interrupt();
-            backgroundService.isRunning = false;
+            isRunning = false;
             backgroundService = null;
-        }
+        super.onDestroy();
     }
-
-
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
         return null;
     }
 
-/*
     @Override
+    public boolean stopService(Intent name) {
+        isRunning = false;
+        return super.stopService(name);
+    }
+
+    /*  @Override
     public IBinder onBind(Intent intent) {
         // TODO: Return the communication channel to the service.
         throw new UnsupportedOperationException("Not yet implemented");
     }
     */
-
-
 }
-

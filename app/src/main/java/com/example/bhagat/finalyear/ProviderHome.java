@@ -1,6 +1,5 @@
 package com.example.bhagat.finalyear;
 
-import android.accounts.Account;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
@@ -13,11 +12,18 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.CompoundButton;
+import android.widget.Switch;
+import android.widget.TextView;
 
-import java.security.Provider;
+import java.util.HashMap;
+import java.util.Map;
+
 
 public class ProviderHome extends AppCompatActivity {
     DrawerLayout dlayout;
@@ -27,12 +33,10 @@ public class ProviderHome extends AppCompatActivity {
     Requests requestsFragment;
     AccountSettings accountSettingsFragment;
     SharedPreferences sharedPreferences;
-
+    TextView welcome;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-
         setContentView(R.layout.activity_provider_home);
         Toolbar toolbar = (Toolbar) findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);
@@ -46,72 +50,90 @@ public class ProviderHome extends AppCompatActivity {
         toggle = new ActionBarDrawerToggle(this, dlayout, 0, 0);
         dlayout.addDrawerListener(toggle);
         toggle.syncState();
-
         manager = getSupportFragmentManager();
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         final SharedPreferences.Editor editor = sharedPreferences.edit();
-        FragmentTransaction ft = manager.beginTransaction();//.detach(requestsFragment).attach(requestsFragment);
+        FragmentTransaction ft = manager.beginTransaction();
         ft.replace(R.id.dummy,requestsFragment);
-        //ft.replace(R.id.dummy, new Requests());
         ft.commit();
 
 
+
         NavigationView navigationView = (NavigationView) findViewById(R.id.navigation_view);
+        View header = (navigationView.getHeaderView(0));
+
+
+        SwitchCompat availability = (SwitchCompat) navigationView.getMenu().getItem(0).getActionView();
+        String username = sharedPreferences.getString("username","User");
+        boolean available = sharedPreferences.getBoolean("available",true);
+        availability.setChecked(available);
+
+        availability.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, final boolean isChecked) {
+                Map<String, String> params = new HashMap<>();
+                params.put("user_id",UserDetails.getInstance().userId);
+                if(isChecked) {
+                    params.put("availability_status", "1");
+                    editor.putBoolean("available",isChecked);
+                    editor.commit();
+                }
+                else{
+                    params.put("availability_status", "0");
+                    editor.putBoolean("available",isChecked);
+                    editor.commit();
+                }
+                String url = UserDetails.getInstance().url + "availability.php";
+                VolleyNetworkManager.getInstance(getApplicationContext()).makeRequest(params, url,
+                        new VolleyNetworkManager.Callback() {
+                            @Override
+                            public void onSuccess(String response) {
+                                Log.d("Availability",response);
+                            }
+                        });
+            }
+        });
+
+
+        welcome = (TextView)header.findViewById(R.id.welcomehead);
+        welcome.setText("Welcome " + username +"!");
 
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-
             @Override
             public boolean onNavigationItemSelected(MenuItem item) {
                 final int id = item.getItemId();
-                if (id == R.id.provider_requests) {
+                if(id == R.id.drawer_switch){
+                    ;
+                }
+                else if (id == R.id.provider_requests) {
                     FragmentTransaction ft = manager.beginTransaction();
+                    requestsFragment = new Requests();
                     ft.replace(R.id.dummy, requestsFragment);
-                    //ft.replace(R.id.dummy, new Requests());
-                    //ft.replace(R.id.account_settings_fragment, requestsFragment);
-
                     ft.commit();
-
                 } else if (id == R.id.provider_settings) {
                     FragmentTransaction ft = manager.beginTransaction();
                     ft.replace(R.id.dummy, accountSettingsFragment);
-                    //ft.replace(R.id.requests_fragment, accountSettingsFragment);
                     ft.commit();
                 }
-                //Todo: conditional statement to check if ProviderTransactions or ConsumerTransactions
                 else if (id == R.id.provider_transactions) {
                     FragmentTransaction ft = manager.beginTransaction();
                     ft.replace(R.id.dummy, providerTransactionsFragment);
-                    //ft.replace(R.id.requests_fragment, accountSettingsFragment);
                     ft.commit();
                 }
                 else if(id == R.id.provider_logout){
                     editor.putString("username", "guest");
                     editor.putBoolean("loggedin", false);
-                    editor.apply();
+                    editor.putBoolean("available",false);
+                    editor.commit();
+                    stopService(new Intent(ProviderHome.this, ProviderBackgroundService.class));
                     startActivity(new Intent(ProviderHome.this, Login.class));
                     finish();
                 }
-                /*
-                else if (id == R.id.logout) {
-                    //    backgrnd_frag_is_home = false;
-                    editor.putString("username", "guest");
-                    editor.putBoolean("loggedin", false);
-                    editor.apply();
-                    Intent i = new Intent(Requests.this, Login.class);
-                    startActivity(i);
-                    finish();
-                    return true;
-                }
-                */
                 DrawerLayout drawer = (DrawerLayout) findViewById(R.id.mydrawerlayout);
                 drawer.closeDrawer(GravityCompat.START);
                 return true;
             }
         });
-
-
-
-
         try {
             //temporary service testing
             startService(new Intent(this, ProviderBackgroundService.class));
@@ -119,28 +141,18 @@ public class ProviderHome extends AppCompatActivity {
         catch (Exception e) {
             Log.e("startService",e.toString());
         }
-
-
-
-
-
-
     }
-
-
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                dlayout.openDrawer(GravityCompat.START);  // OPEN DRAWER
-                return true;
+                 dlayout.openDrawer(GravityCompat.START);  // OPEN DRAWER
+                 return true;
         }
         return super.onOptionsItemSelected(item);
     }
-
     @Override
     protected void onPostCreate(@Nullable Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         toggle.syncState();
     }
-
 }

@@ -3,24 +3,25 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_item1"
+            android:id="@+id/drawer_switch"
             android:title="Availibility"
+            android:icon="@drawable/ic_perm_identity_black_24dp"
             app:actionLayout="@layout/layout_switch"
             />
         <item
             android:id="@+id/provider_requests"
             android:title="Requests"
-            android:icon="@drawable/requests">
+            android:icon="@drawable/ic_notifications_black_24dp">
         </item>
         <item
             android:id="@+id/provider_transactions"
             android:title="Transactions"
-            android:icon="@drawable/ic_action_calendar_day"
+            android:icon="@drawable/ic_receipt_black_24dp"
             />
         <item
             android:id="@+id/provider_settings"
             android:title="Settings"
-            android:icon="@drawable/settings">
+            android:icon="@drawable/ic_settings_black_24dp">
         </item>
         <item
             android:id="@+id/provider_logout"

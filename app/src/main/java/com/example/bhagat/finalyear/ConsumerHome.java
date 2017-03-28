@@ -16,6 +16,9 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Switch;
+import android.widget.TextView;
 
 public class ConsumerHome extends AppCompatActivity {
     DrawerLayout dlayout;
@@ -26,6 +29,8 @@ public class ConsumerHome extends AppCompatActivity {
     AccountSettings accountSettingsFragment;
     NearbyServices nearbyServicesFragment;
     SharedPreferences sharedPreferences;
+    TextView welcome;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +48,6 @@ public class ConsumerHome extends AppCompatActivity {
         consumerTransactionsFragment = new ConsumerTransactions();
         //accountSettingsFragment = new AccountSettings();
         nearbyServicesFragment = new NearbyServices();
-
         toggle = new ActionBarDrawerToggle(this, dlayout, 0, 0);
         dlayout.addDrawerListener(toggle);
         toggle.syncState();
@@ -58,6 +62,10 @@ public class ConsumerHome extends AppCompatActivity {
 
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.navigation_view_consumer);
+        String username = sharedPreferences.getString("username","User");
+        View header = (navigationView.getHeaderView(0));
+        welcome = (TextView)header.findViewById(R.id.welcomehead);
+        welcome.setText("Welcome " + username +"!");
 
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
 
@@ -91,20 +99,10 @@ public class ConsumerHome extends AppCompatActivity {
                     editor.putString("username", "guest");
                     editor.putBoolean("loggedin", false);
                     editor.apply();
+                    stopService(new Intent(ConsumerHome.this, ConsumerBackgroundService.class));
                     startActivity(new Intent(ConsumerHome.this, Login.class));
                     finish();
                 }
-                /*
-                else if (id == R.id.logout) {
-                    //    backgrnd_frag_is_home = false;
-                    editor.putString("username", "guest");
-                    editor.putBoolean("loggedin", false);
-                    editor.apply();
-                    Intent i = new Intent(Requests.this, Login.class);
-                    startActivity(i);
-                    finish();
-                    return true;
-                }*/
                 DrawerLayout drawer = (DrawerLayout) findViewById(R.id.mydrawerlayout);
                 drawer.closeDrawer(GravityCompat.START);
                 return true;

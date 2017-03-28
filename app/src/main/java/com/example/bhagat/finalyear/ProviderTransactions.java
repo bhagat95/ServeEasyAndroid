@@ -37,7 +37,6 @@ public class ProviderTransactions extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.activity_provider_transactions, container, false);
-
         return v;
         //return super.onCreateView(inflater, container, savedInstanceState);
     }
@@ -49,44 +48,34 @@ public class ProviderTransactions extends Fragment {
         myRecyclerView.setHasFixedSize(true);
         myLayoutManager = new LinearLayoutManager(getContext());
         myRecyclerView.setLayoutManager(myLayoutManager);
-        arrayOfItems = new ArrayList<ListData>();
-
+        arrayOfItems = new ArrayList<>();
         getDataSet();
+        //myAdapter = new ProviderTransactionsAdapter(arrayOfItems);
+        //myRecyclerView.setAdapter(myAdapter);
 
-        myAdapter = new ProviderTransactionsAdapter(getContext(), 0, arrayOfItems);
-        myRecyclerView.setAdapter(myAdapter);
-
-        Toast.makeText(getContext(), "chal gaya re bhai", Toast.LENGTH_SHORT).show();
     }
 
     void getDataSet() {
-
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
         params.put("provider_id",UserDetails.getInstance().providerId);
+        String url = UserDetails.getInstance().url + "fetch_provider_transactions.php";
         VolleyNetworkManager.getInstance(getContext()).makeRequest(params,
-                "fetch_provider_transactions.php", new VolleyNetworkManager.Callback() {
+                url, new VolleyNetworkManager.Callback() {
                     @Override
                     public void onSuccess(String response) {
-
                         Log.d("ProviderTransactions", response);
                         try {
                             JSONArray jsonArray = new JSONArray(response);
-
                             for (int i = 0; i < jsonArray.length(); i++) {
-
                                 JSONObject jOb = jsonArray.getJSONObject(i);
                                 arrayOfItems.add(new ListData(jOb));
                             }
-
-                            myAdapter = new ProviderTransactionsAdapter(getContext(), 0, arrayOfItems);
+                            myAdapter = new ProviderTransactionsAdapter(arrayOfItems);
                             myRecyclerView.setAdapter(myAdapter);
-
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-
                     }
                 });
-
     }
 }

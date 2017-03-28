@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,87 +37,24 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link //PendingRequests.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link PendingRequests#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class PendingRequests extends Fragment implements RequestDetails.RequestDialogResponse {
+public class PendingRequests extends Fragment implements RequestDetails.RequestDialogResponse,SwipeRefreshLayout.OnRefreshListener {
 
     ListView requestsList;
     ArrayList<ListData> arrayOfItems;
     RequestsAdapter adapter;
-    String request_id = "";
-
-    // TODO: update showDetails()
-
-
-    public PendingRequests() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment PendingRequests.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static PendingRequests newInstance(String param1, String param2) {
-        PendingRequests fragment = new PendingRequests();
-        Bundle args = new Bundle();
-        //args.putString(ARG_PARAM1, param1);
-        //args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        /*
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-        */
-
-    }
+    String request_id = "",consumerAddress;
+    SwipeRefreshLayout swipeRefreshLayout;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View v = inflater.inflate(R.layout.fragment_pending_requests, container, false);
-
+        final View v = inflater.inflate(R.layout.fragment_pending_requests, container, false);
         requestsList = (ListView) v.findViewById(R.id.list);
-
-        //  ListView
-        arrayOfItems = new ArrayList<ListData>();
-        //temporary add
-        //for(int i =0; i<10;i++)
-        //  arrayOfItems.add(new ListData());
-        arrayOfItems = new ArrayList<ListData>();
-
-        getRequests();
-
+        arrayOfItems = new ArrayList<>();
+        //getRequests();
         adapter = new RequestsAdapter(getContext(), 0, arrayOfItems);
         requestsList.setAdapter(adapter);
 
-
-//  To open the dialog for details
-/*
-        b.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //showDetails();
-            }
-        });
-*/
         requestsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -127,6 +65,8 @@ public class PendingRequests extends Fragment implements RequestDetails.RequestD
                 TextView categoryNameView = (TextView)view.findViewById(R.id.category);
                 String categoryName = categoryNameView.getText().toString();
 
+                //todo: distance is to be calculated (Eucledean/distance-matrix)
+
                 TextView distanceView = (TextView)view.findViewById(R.id.distance);
                 String distance = distanceView.getText().toString();
 
@@ -135,80 +75,90 @@ public class PendingRequests extends Fragment implements RequestDetails.RequestD
 
                 try {
                     request_id = arrayOfItems.get(i).jOb.getString("request_id");
+                    consumerAddress = arrayOfItems.get(i).jOb.getString("address");
                 }
                 catch (Exception e){
-
                 }
-
-                showDetails(i,consumerName,categoryName,distance,quantity,request_id);
+                showDetails(i,consumerName,categoryName,distance,quantity,request_id,consumerAddress);
             }
         });
-
+        swipeRefreshLayout = (SwipeRefreshLayout)v.findViewById(R.id.swipe_refresh_layout);
+        swipeRefreshLayout.setOnRefreshListener(this);
+        swipeRefreshLayout.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        swipeRefreshLayout.setRefreshing(true);
+                                        getRequests();
+                                    }
+                                }
+        );
         return v;
     }
 
 
-    private void showDetails(int position,String consumerName,String categoryName,String distance, String quantity,String request_id) {
+    private void showDetails(int position,String consumerName,String categoryName,String distance, String quantity,String request_id,String address) {
         FragmentManager fm = getFragmentManager();
 
         Bundle args = new Bundle();
-        args.putInt("position",position);
         args.putString("consumerName",consumerName);
         args.putString("categoryName",categoryName);
         args.putString("quantity",quantity);
         args.putString("distance",distance);
         args.putString("request_id",request_id);
+        args.putString("address",address);
         args.putInt("listItemPosition", position);
 
         RequestDetails details = RequestDetails.newInstance();
         details.setTargetFragment(this, 0);
         details.setArguments(args);
-
-        details.show(fm, "PendingDialogTag");
+        details.show(fm,"pendingDialogTag");
 
     }
 
 
     @Override
     public void onDialogResponse(String response, int position) {
-        if(response.equals("accept")){
-            Toast.makeText(getActivity(), "Accept ho gaya re bhai", Toast.LENGTH_SHORT).show();
+        if(response.equals("accept")){ // Here, accept == done
             makeRequestStatusDelivered();
+            //todo:now check if this moved to transactions
             arrayOfItems.remove(position);
             requestsList.invalidateViews();
         }
-        else if (response.equals("decline")){
+        else if (response.equals("decline")){ // Here,decline == cancel
             //adapter.remove(adapter.getItem(position));
-            Log.d("listSize", arrayOfItems.size()+"");
-            //adapter.remove(adapter.getItem(position));
+           // Log.d("listSize", arrayOfItems.size()+"");
             makeRequestStatusCancelled();
+            //todo:now check if this moved to transactions
             arrayOfItems.remove(position);
             requestsList.invalidateViews();
-            //adapter.notifyDataSetChanged();
-            Log.d("newListSize", arrayOfItems.size()+"");
-            Toast.makeText(getActivity(), "serverUpdate "+position+arrayOfItems.size(), Toast.LENGTH_SHORT).show();
+            //Log.d("newListSize", arrayOfItems.size()+"");
+
         }
     }
 
 
     void makeRequestStatusDelivered(){
-        Map<String, String> params = new HashMap<String, String>();
-        params.put("status","3");
+        Toast.makeText(getActivity(),"Done clicked",Toast.LENGTH_LONG).show();
+        Map<String, String> params = new HashMap<>();
+        params.put("status","3");// move to transactions
         params.put("request_id",request_id);
-        VolleyNetworkManager.getInstance(getContext()).makeRequest(params, "update_request_status.php",
+        String url = UserDetails.getInstance().url + "update_request_status.php";
+        VolleyNetworkManager.getInstance(getContext()).makeRequest(params, url,
                 new VolleyNetworkManager.Callback() {
                     @Override
                     public void onSuccess(String response) {
                         Log.d("makeStatusDelivered",response);
                     }
                 });
+        //here, no notification will be sent, only transactions will move to transactions page for provider
     }
 
     void makeRequestStatusCancelled(){
-        Map<String, String> params = new HashMap<String, String>();
-        params.put("status","4");
+        Map<String, String> params = new HashMap<>();
+        params.put("status","4"); // move to transactions
         params.put("request_id",request_id);
-        VolleyNetworkManager.getInstance(getContext()).makeRequest(params, "update_request_status.php",
+        String url = UserDetails.getInstance().url + "update_request_status.php";
+        VolleyNetworkManager.getInstance(getContext()).makeRequest(params, url,
                 new VolleyNetworkManager.Callback() {
                     @Override
                     public void onSuccess(String response) {
@@ -217,56 +167,36 @@ public class PendingRequests extends Fragment implements RequestDetails.RequestD
                 });
     }
 
-
     void getRequests() {
-        RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
-
+        Map<String, String> params = new HashMap<>();
+        params.put("provider_id", UserDetails.getInstance().providerId);
+        params.put("type","pending");
         String url = UserDetails.getInstance().url + "fetch_requests.php";
-        //->GET REQUEST USING VOLLEY
-        StringRequest request = new StringRequest(Request.Method.POST, url,
-                new Response.Listener<String>() {
+        VolleyNetworkManager.getInstance(getContext()).makeRequest(params, url,
+                new VolleyNetworkManager.Callback() {
                     @Override
-                    public void onResponse(String response) {
+                    public void onSuccess(String response) {
                         Log.d("PendingRequest response", response);
                         try {
+                            if(arrayOfItems!=null)
+                                arrayOfItems.clear();
                             JSONArray jsonArray = new JSONArray(response);
-
                             for (int i = 0; i < jsonArray.length(); i++) {
-
                                 JSONObject jOb = jsonArray.getJSONObject(i);
                                 arrayOfItems.add(new ListData(jOb));
-
                             }
-                            RequestsAdapter adapter = new RequestsAdapter(getActivity(), 0, arrayOfItems);
-                            requestsList.setAdapter(adapter);
-
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-
+                        adapter.notifyDataSetChanged();
+                        swipeRefreshLayout.setRefreshing(false);
                     }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(getActivity(), error.getMessage(), Toast.LENGTH_LONG).show();
-                        Log.d("fetch_services error", error.toString());
-                    }
-                }
-        )
+                });
+    }
 
-        {
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<String, String>();
-                params.put("provider_id", UserDetails.getInstance().providerId);
-                params.put("type", "pending");
-
-                return params;
-            }
-        };
-        requestQueue.add(request);
-
+    @Override
+    public void onRefresh() {
+        getRequests();
     }
 
 
@@ -289,7 +219,6 @@ public class PendingRequests extends Fragment implements RequestDetails.RequestD
             mListener.onFragmentInteraction(uri);
         }
     }
-
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -300,13 +229,11 @@ public class PendingRequests extends Fragment implements RequestDetails.RequestD
                     + " must implement OnFragmentInteractionListener");
         }
     }
-
     @Override
     public void onDetach() {
         super.onDetach();
         mListener = null;
     }
-
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
@@ -323,6 +250,5 @@ public class PendingRequests extends Fragment implements RequestDetails.RequestD
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
-
     */
 }
