@@ -2,6 +2,7 @@ package com.example.bhagat.finalyear;
 
 import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -81,6 +82,7 @@ public class VolleyNetworkManager {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Log.e(TAG , "Error Response code: " + error.toString());//error.networkResponse.statusCode);
+                        //Toast.makeText(, "no internet", Toast.LENGTH_SHORT).show();
                         /*
                         if (null != error.networkResponse){
                             listener.getResult(false);
