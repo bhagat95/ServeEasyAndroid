@@ -147,6 +147,7 @@ public class Registration extends AppCompatActivity {
                                 Log.d(TAG+"findPlaceCoordinates","calling");
                                 findPlaceCoordinates();
 
+
                             }
                         } catch (Exception e) {
                             //isMobileNoAvaialble = false;
@@ -181,44 +182,36 @@ public class Registration extends AppCompatActivity {
                             //Toast.makeText(Registration.this,"here" + loc_x + " " + loc_y,Toast.LENGTH_LONG).show();
                             placeCoordinates = true;
 
-                            Log.d("register","calling");
-                            register();
+                            Log.d(TAG+"callOTPVerification","calling");
+                            callOTPVerification();
+
 
                         } catch (Exception e) {
                             //placeCoordinates = false;
                             e.printStackTrace();
                         }
                     }
+
+
                 });
 
         return placeCoordinates;
     }
 
-    //// TODO: 2/13/17  redirect to login activity on success
-    public boolean register() {
-        //String url = "http://192.168.109.41/se_register.php";
-        Map<String, String> params = new HashMap<>();
-
-        params.put("user_type", user.userType);
-        params.put("name", user.name);
-        params.put("mobile_no", user.mobileNo);
-        params.put("password", user.password);
-        params.put("address", user.address);
-        params.put("loc_x", loc_x+"");
-        params.put("loc_y", loc_y+"");
-
-        String url = UserDetails.getInstance().url + "se_register.php";
-        VolleyNetworkManager.getInstance(getApplicationContext()).makeRequest(params, url,
-                new VolleyNetworkManager.Callback() {
-                    @Override
-                    public void onSuccess(String response) {
-                        Log.d("registration response", response);
-                        Toast.makeText(getApplicationContext(), response, Toast.LENGTH_LONG).show();
-                        startActivity(new Intent(Registration.this, Login.class));
-                        finish();
-                    }
-                });
-
-        return true;
+    void callOTPVerification(){
+        Bundle bundle = new Bundle();
+        bundle.putString("user_type", user.userType);
+        bundle.putString("name", user.name);
+        bundle.putString("mobile_no", user.mobileNo);
+        bundle.putString("password", user.password);
+        bundle.putString("address", user.address);
+        bundle.putString("loc_x", loc_x+"");
+        bundle.putString("loc_y", loc_y+"");
+        Log.d("CallOTPmobile",user.mobileNo+" "+bundle.getString("mobile_no"));
+        Intent i = new Intent(Registration.this,OTPVerification.class);
+        i.putExtra("registrationDetailsBundle",bundle);
+        startActivity(i);
     }
+
+
 }

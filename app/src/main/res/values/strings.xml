@@ -16,4 +16,7 @@
     <string name="registration_address">Address</string>
     <string name="registration_submit_button">Submit</string>
     <string name="call_button">this is contact contentDescription</string>
+    <string name="msg_sit_back">Sit back and Relax! while we verify your mobile</string>
+    <string name="msg_manual_otp">(Enter the OTP in case in case if we fail to detect the SMS automatically)</string>
+    <string name="API_KEY">141476AGeh58xdM58a4ab99</string>
 </resources>
