@@ -15,6 +15,7 @@ public class UserDetails {
     public String latitude = "1.1";
     public String longitude = "1.1";
     public boolean isProvider = true;
+    public String radialDistance = "100";
     public static UserDetails getInstance() {
         return ourInstance;
     }

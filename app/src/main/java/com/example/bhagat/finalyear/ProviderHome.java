@@ -20,6 +20,7 @@ import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -90,6 +91,11 @@ public class ProviderHome extends AppCompatActivity {
                             public void onSuccess(String response) {
                                 Log.d("Availability",response);
                             }
+
+                            @Override
+                            public void onError(String error) {
+                                Toast.makeText(ProviderHome.this,error,Toast.LENGTH_LONG).show();
+                            }
                         });
             }
         });
@@ -145,8 +151,8 @@ public class ProviderHome extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                 dlayout.openDrawer(GravityCompat.START);  // OPEN DRAWER
-                 return true;
+                dlayout.openDrawer(GravityCompat.START);  // OPEN DRAWER
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }

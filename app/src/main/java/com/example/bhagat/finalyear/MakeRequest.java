@@ -6,9 +6,12 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
@@ -18,6 +21,7 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -31,10 +35,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+
+import static com.example.bhagat.finalyear.Login.context;
 
 
 public class MakeRequest extends AppCompatActivity {
@@ -42,11 +49,12 @@ public class MakeRequest extends AppCompatActivity {
     com.android.volley.RequestQueue requestQueue;
     JSONArray jArr;
     String selectedCategoryId = "", serviceIdVal= "",providerNameVal="",serviceNameVal="",providerPhnoVal="";
-    ImageButton dueDate, callButton;
+    ImageView dueDate;
+    FloatingActionButton callButton;
     TextView selectDate,serviceName,providerName,providerPhno;
     EditText quantity,address;
     Spinner selectCategory;
-    Button submit;
+    CardView submit;
     int year, month, day, dueDay,dueMonth, dueYear;
     static final int DIALOG_ID = 0;
 
@@ -54,11 +62,8 @@ public class MakeRequest extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_make_request);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.app_bar);
-        setSupportActionBar(toolbar);
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        }
+
+
         requestQueue = Volley.newRequestQueue(this);
 
         serviceIdVal = getIntent().getStringExtra("serviceId");
@@ -79,24 +84,26 @@ public class MakeRequest extends AppCompatActivity {
 
         Toast.makeText(this,serviceIdVal +"",Toast.LENGTH_LONG).show();
 
-        submit  = (Button) findViewById(R.id.submit);
-        callButton = (ImageButton) findViewById(R.id.call_button);
-        dueDate = (ImageButton) findViewById(R.id.pick_date_button);
+        submit  = (CardView) findViewById(R.id.submit_button);
+        callButton = (FloatingActionButton) findViewById(R.id.call_button);
+        dueDate = (ImageView) findViewById(R.id.pick_date_button);
         selectCategory = (Spinner) findViewById(R.id.select_category);
 
         String date = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
 
-        Toast.makeText(this,date,Toast.LENGTH_LONG).show();
+        Toast.makeText(this,"date" + date,Toast.LENGTH_LONG).show();
 
         //set current date
         java.util.Calendar calendar = java.util.Calendar.getInstance();
         year = calendar.get(java.util.Calendar.YEAR);
-        month = calendar.get(java.util.Calendar.MONTH);
+        month = calendar.get(java.util.Calendar.MONTH) + 1;
         day = calendar.get(java.util.Calendar.DAY_OF_MONTH);
+
 
         dueDay = day;
         dueMonth = month;
         dueYear = year;
+
 
         //call
         callButton.setOnClickListener(new View.OnClickListener() {
@@ -104,24 +111,20 @@ public class MakeRequest extends AppCompatActivity {
             public void onClick(View view) {
                 String phoneNumber = "tel:"+providerPhnoVal;
                 Intent callIntent = new Intent(Intent.ACTION_CALL, Uri.parse(phoneNumber));
-
                 if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
                     Log.d("Call permission", "denied");
                     return;
                 }
-
                 Log.d("Call", "success");
                 startActivity(callIntent);
             }
         });
-
         //set date
         dueDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 //showDialogOnClick();
                 showDialog(DIALOG_ID);
-
             }
         });
 
@@ -132,7 +135,6 @@ public class MakeRequest extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 submitRequst();
-
             }
         });
     }
@@ -146,6 +148,8 @@ public class MakeRequest extends AppCompatActivity {
     }
 
 
+
+
     DatePickerDialog.OnDateSetListener dplistener = new DatePickerDialog.OnDateSetListener() {
         @Override
         public void onDateSet(DatePicker datePicker, int i, int i1, int i2) {
@@ -156,6 +160,12 @@ public class MakeRequest extends AppCompatActivity {
             Log.d("Date ",""+dueDay+"/"+ dueMonth +"/"+dueYear);
         }
     };
+
+    /*DatePickerDialog datePickerDialog = new DatePickerDialog(context, DatePickerListener, year, month, day);
+    datePickerDialog.getDatePicker().setMinDate(calendar.getTimeInMillis());
+    datePickerDialog.show();*/
+
+
 
     ///volley
     public void inflateCategorySpinner(){
@@ -187,7 +197,7 @@ public class MakeRequest extends AppCompatActivity {
                             @Override
                             public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
                                 try {
-                                    selectedCategoryId = (String) jArr.getJSONObject(position).getString("category_id");
+                                    selectedCategoryId = jArr.getJSONObject(position).getString("category_id");
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
@@ -199,6 +209,11 @@ public class MakeRequest extends AppCompatActivity {
                         });
 
                     }
+
+                    @Override
+                    public void onError(String error) {
+                        Toast.makeText(getApplicationContext(),error,Toast.LENGTH_LONG).show();
+                    }
                 });
     }
 
@@ -207,6 +222,12 @@ public class MakeRequest extends AppCompatActivity {
         String url = UserDetails.getInstance().url+"make_request.php";
 
         Map<String, String> params = new HashMap<>();
+        params.put("day", String.valueOf(day));
+        params.put("month", String.valueOf(month));
+        params.put("year", String.valueOf(year));
+
+        //Log.d("day",String.valueOf(day));
+
         params.put("service_id", serviceIdVal);
         params.put("consumer_id", UserDetails.getInstance().consumerId);
         params.put("category_id", selectedCategoryId);
@@ -217,18 +238,26 @@ public class MakeRequest extends AppCompatActivity {
         params.put("due_day", String.valueOf(dueDay));
         params.put("due_month", String.valueOf(dueMonth));
         params.put("due_year", String.valueOf(dueYear));
-        params.put("day", String.valueOf(day));
-        params.put("month", String.valueOf(month));
-        params.put("year", String.valueOf(year));
+
+
+
+
+
+
         VolleyNetworkManager.getInstance(getApplicationContext()).makeRequest(params,
                 url, new VolleyNetworkManager.Callback() {
                     @Override
                     public void onSuccess(String response) {
                         Log.d("Response123", response);
-                        Toast.makeText(getApplicationContext(),response,Toast.LENGTH_LONG).show();
+                        //Toast.makeText(getApplicationContext(),response,Toast.LENGTH_LONG).show();
                         Intent intent = new Intent(getApplicationContext(),ConsumerHome.class);
                         startActivity(intent);
+                        finish();
                         /// /new Intent(getApplicationContext(),NearbyServices.class));
+                    }
+                    @Override
+                    public void onError(String error) {
+                        Toast.makeText(getApplicationContext(),error,Toast.LENGTH_LONG).show();
                     }
                 });
     }

@@ -80,7 +80,7 @@ public class Registration extends AppCompatActivity {
         if (checkValidity()) {
             //check mobile no availibility -- backend
             checkMobileNoAvailibility();
-                //continued in checkMobileNoAvailability()
+            //continued in checkMobileNoAvailability()
         }
     }
 
@@ -144,7 +144,7 @@ public class Registration extends AppCompatActivity {
                             } else {
                                 isMobileNoAvaialble = true;
 
-                                Log.d(TAG+"findPlaceCoordinates","calling");
+                                //Log.d(TAG+"findPlaceCoordinates","calling");
                                 findPlaceCoordinates();
 
 
@@ -154,8 +154,13 @@ public class Registration extends AppCompatActivity {
                         }
 
                     }
+
+                    @Override
+                    public void onError(String error) {
+                        Toast.makeText(getApplicationContext(),error,Toast.LENGTH_LONG).show();
+                    }
                 });
-        Log.d(TAG+"checkNumberAvailability","called");
+        //Log.d(TAG+"checkNumberAvailability","called");
         //return isMobileNoAvaialble;
     }
 
@@ -182,7 +187,7 @@ public class Registration extends AppCompatActivity {
                             //Toast.makeText(Registration.this,"here" + loc_x + " " + loc_y,Toast.LENGTH_LONG).show();
                             placeCoordinates = true;
 
-                            Log.d(TAG+"callOTPVerification","calling");
+                            //Log.d(TAG+"callOTPVerification","calling");
                             callOTPVerification();
 
 
@@ -192,7 +197,10 @@ public class Registration extends AppCompatActivity {
                         }
                     }
 
-
+                    @Override
+                    public void onError(String error) {
+                        Toast.makeText(getApplicationContext(),error,Toast.LENGTH_LONG).show();
+                    }
                 });
 
         return placeCoordinates;

@@ -65,20 +65,16 @@ public class SMSReceiver extends BroadcastReceiver {
      *
      * @param message
      * @return
-
     private String getVerificationCode(String message) {
-        String code = null;
-        int index = message.indexOf(Config.OTP_DELIMITER);
-
-        if (index != -1) {
-            int start = index + 2;
-            int length = 6;
-            code = message.substring(start, start + length);
-            return code;
-        }
-
-        return code;
+    String code = null;
+    int index = message.indexOf(Config.OTP_DELIMITER);
+    if (index != -1) {
+    int start = index + 2;
+    int length = 6;
+    code = message.substring(start, start + length);
+    return code;
     }
-    */
+    return code;
+    }
+     */
 }
-

@@ -5,6 +5,9 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v7.app.NotificationCompat;
@@ -57,6 +60,10 @@ public class ConsumerBackgroundService extends Service {
         notification.setSmallIcon(R.drawable.person);
         notification.setTicker("New request");
         notification.setWhen(System.currentTimeMillis());
+
+        Uri sound = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.notification_sound);
+        notification.setSound(sound);
+
         notification.setContentTitle(categoryName);
         notification.setContentText("Your following request has been accepted by the provder:" + consumerName+" requested for "+quantity+" "+categoryName);
         Intent intent = new Intent(this, NearbyServices.class);
@@ -74,6 +81,8 @@ public class ConsumerBackgroundService extends Service {
         notification.setSmallIcon(R.drawable.person);
         notification.setTicker("New request");
         notification.setWhen(System.currentTimeMillis());
+        Uri sound = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.notification_sound);
+        notification.setSound(sound);
         notification.setContentTitle(categoryName);
         notification.setContentText("Sorry your following request has been cancelled by the provder:" + "You requested for "+quantity+" "+categoryName);
 
@@ -83,7 +92,6 @@ public class ConsumerBackgroundService extends Service {
         //Builds notification and issues it
         NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         nm.notify(notificationID, notification.build());
-
     }
 
 
@@ -102,8 +110,8 @@ public class ConsumerBackgroundService extends Service {
 
 
 
-    class BackgroundService extends Thread {
-
+    class BackgroundService extends Thread  {
+        boolean hasInternet = false;
         public long TIME_GAP = 3000;
         //        Handler networkRequest= new Handler();
         Runnable runTask = new Runnable() {
@@ -112,6 +120,7 @@ public class ConsumerBackgroundService extends Service {
             public void run() {
                 isRunning = true;
                 while (isRunning) {
+
                     count++;
                     try {
                         Log.d("CBackgroundServiceCount", count+"");
@@ -204,7 +213,7 @@ public class ConsumerBackgroundService extends Service {
                                 generateAcceptedNotifications(jOb.getString("category_name"),
                                         jOb.getString("consumer_name"),
                                         jOb.getString("quantity"));
-                            else
+                            else if(seenVal.equals("4"))
                                 generateCancelledNotifications(jOb.getString("category_name"),
                                         jOb.getString("consumer_name"),
                                         jOb.getString("quantity"));

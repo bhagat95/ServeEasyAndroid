@@ -3,11 +3,13 @@ package com.example.bhagat.finalyear;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -39,16 +41,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class NearbyServices extends Fragment implements ActivityCompat.OnRequestPermissionsResultCallback,LocationListener {
+public class NearbyServices extends Fragment implements ActivityCompat.OnRequestPermissionsResultCallback,LocationListener{
 
-    RequestQueue requestQueue;
+    SharedPreferences sharedPreferences;
     ListView requestsList;
     ArrayList<ListData> arrayOfItems;
     private LocationManager locationManager;
     private static final long MIN_TIME = 400;
     private static final float MIN_DISTANCE = 1000;
     double latitude,longitude;
-
+    String radialDistance = "100";
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -60,6 +62,8 @@ public class NearbyServices extends Fragment implements ActivityCompat.OnRequest
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+
         requestsList = (ListView) getActivity().findViewById(R.id.list);
         //  ListView
         arrayOfItems = new ArrayList<>();
@@ -116,9 +120,12 @@ public class NearbyServices extends Fragment implements ActivityCompat.OnRequest
 
     ///volley
     void getServices() {
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
         params.put("consumer_locx", latitude + "");
         params.put("consumer_locy", longitude + "");
+        Toast.makeText(getActivity(),latitude+" "+longitude,Toast.LENGTH_LONG).show();
+        Toast.makeText(getActivity(),sharedPreferences.getString("radial_distance","100"),Toast.LENGTH_LONG).show();
+        params.put("radial_distance",sharedPreferences.getString("radial_distance","100"));
         String url = UserDetails.getInstance().url + "fetch_services.php";
         VolleyNetworkManager.getInstance(getContext()).makeRequest(params,
                 url, new VolleyNetworkManager.Callback() {
@@ -137,6 +144,10 @@ public class NearbyServices extends Fragment implements ActivityCompat.OnRequest
                         }
                         NearbyServicesAdapter adapter = new NearbyServicesAdapter(getActivity(), 0, arrayOfItems);
                         requestsList.setAdapter(adapter);
+                    }
+                    @Override
+                    public void onError(String error) {
+                        Toast.makeText(getActivity(),error,Toast.LENGTH_LONG).show();
                     }
                 });
     }
@@ -161,7 +172,8 @@ public class NearbyServices extends Fragment implements ActivityCompat.OnRequest
         UserDetails.getInstance().latitude = latitude+"";
         UserDetails.getInstance().longitude = longitude+"";
         Log.d("Longitude", longitude + " ");
-        latitude = location.getLatitude();
+        //Toast.makeText(getActivity(),latitude +" "+longitude,Toast.LENGTH_LONG).show();
+        //latitude = location.getLatitude();
         Log.d("Latitude", latitude + " ");
     }
     @Override
@@ -173,5 +185,4 @@ public class NearbyServices extends Fragment implements ActivityCompat.OnRequest
     @Override
     public void onProviderDisabled(String s) {
     }
-
 }

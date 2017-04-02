@@ -49,9 +49,9 @@ public class OTPVerification extends AppCompatActivity {
         inputOtp = (EditText) findViewById(R.id.inputOtp);
         submit = (Button) findViewById(R.id.btn_verify_otp);
         resendOTP = (Button) findViewById(R.id.resend_otp);
-        progressBar = (ProgressBar) findViewById(R.id.progressBar);
-        txtEditMobile = (TextView) findViewById(R.id.txt_edit_mobile);
-        layoutEditMobile = (LinearLayout) findViewById(R.id.layout_edit_mobile);
+        //progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        //txtEditMobile = (TextView) findViewById(R.id.txt_edit_mobile);
+        //layoutEditMobile = (LinearLayout) findViewById(R.id.layout_edit_mobile);
 
         requestQueue = Volley.newRequestQueue(getApplicationContext());
 
@@ -144,7 +144,6 @@ public class OTPVerification extends AppCompatActivity {
 
 /*
     void resendOTP(String type){
-
         OTP = (mobileNo.hashCode()+"").substring(0,3);
         //String urlResendOTP = "https://control.msg91.com/api/retryotp.php?authkey=YourAuthKey&mobile=919999999990" +
            //     "&retrytype=voice";
@@ -167,7 +166,6 @@ public class OTPVerification extends AppCompatActivity {
                             e.printStackTrace();
                             Toast.makeText(getApplicationContext(), "An error has occured", Toast.LENGTH_SHORT).show();
                         }
-
                     }
                 },
                 new Response.ErrorListener() {
@@ -178,10 +176,8 @@ public class OTPVerification extends AppCompatActivity {
                     }
                 }
         );
-
         requestQueue.add(request);
     }
-
     */
 
     //// TODO: 2/13/17  redirect to login activity on success
@@ -206,6 +202,11 @@ public class OTPVerification extends AppCompatActivity {
                         Toast.makeText(getApplicationContext(), response, Toast.LENGTH_LONG).show();
                         startActivity(new Intent(OTPVerification.this, Login.class));
                         finish();
+                    }
+
+                    @Override
+                    public void onError(String error) {
+                        Toast.makeText(getApplicationContext(),error,Toast.LENGTH_LONG).show();
                     }
                 });
 

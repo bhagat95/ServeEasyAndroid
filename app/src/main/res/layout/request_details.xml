@@ -2,89 +2,134 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center_horizontal"
-    >
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <TextView
-        android:id="@+id/customerName"
+
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/detail"
+        android:layout_margin="@dimen/activity_horizontal_margin"
+        android:layout_centerInParent="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/request_dialog_margin"
-        android:text="Customer Name"
-        android:textSize="@dimen/request_dialog_text_size"
-        android:layout_centerHorizontal="true"
-        />
+        app:cardBackgroundColor="@color/colorPrimary">
 
-    <TextView
-        android:id="@+id/customerAddress"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/customerName"
-        android:layout_margin="@dimen/request_dialog_margin"
-        android:text="Customer Address"
-        android:textSize="@dimen/request_dialog_text_size"
-        android:layout_centerHorizontal="true"
-        />
-
-    <LinearLayout
-        android:id="@+id/categoryLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_below="@+id/customerAddress"
-        android:layout_margin="@dimen/request_dialog_margin"
-        android:gravity="center_horizontal">
-
-        <TextView
-            android:id="@+id/category"
+        <RelativeLayout
+            android:layout_margin="@dimen/activity_horizontal_margin"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/request_dialog_margin"
-            android:text="Category"
-            android:textSize="@dimen/request_dialog_text_size"
-            />
+            android:layout_height="match_parent">
+            <TextView
+                android:id="@+id/customerName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Customer Name"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/request_dialog_text_size" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Due date :"
+                android:textSize="@dimen/request_dialog_text_size"
+                android:layout_marginTop="35dp"
+                android:layout_below="@+id/categoryLayout"
+                android:id="@+id/textView2" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:hint="due date"
+                android:id="@+id/due_date"
+                android:layout_marginStart="18dp"
+                android:textSize="@dimen/request_dialog_text_size"
+                android:layout_alignBaseline="@+id/textView2"
+                android:layout_alignBottom="@+id/textView2"
+                android:layout_toEndOf="@+id/textView2" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/consumer_phno"
+                android:textSize="@dimen/request_dialog_text_size"
+                android:layout_marginLeft="@dimen/request_dialog_margin"
+                android:layout_marginRight="@dimen/request_dialog_margin"
+                android:text="9199995326"
+                android:layout_below="@+id/customerName"
+                android:layout_marginTop="24dp" />
+            <TextView
+                android:id="@+id/customerAddress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Customer Address"
+                android:textSize="@dimen/request_dialog_text_size"
+                android:layout_marginLeft="@dimen/request_dialog_margin"
+                android:layout_marginRight="@dimen/request_dialog_margin"
+                android:layout_marginTop="75dp"
+                android:layout_below="@+id/customerName" />
 
-        <TextView
-            android:id="@+id/quantity"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/request_dialog_margin"
-            android:text="quantity"
-            android:textSize="@dimen/request_dialog_text_size"
-            />
+            <LinearLayout
+                android:id="@+id/categoryLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_horizontal"
+                android:layout_marginLeft="@dimen/request_dialog_margin"
+                android:layout_marginRight="@dimen/request_dialog_margin"
+                android:layout_below="@+id/customerAddress"
+                android:layout_alignEnd="@+id/linearLayout"
+                android:layout_marginTop="15dp">
+
+                <TextView
+                    android:id="@+id/category"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/request_dialog_margin"
+                    android:text="Category"
+                    android:textSize="@dimen/request_dialog_text_size"
+                    />
+
+                <TextView
+                    android:id="@+id/quantity"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/request_dialog_margin"
+                    android:text="quantity"
+                    android:textSize="@dimen/request_dialog_text_size"
+                    />
+            </LinearLayout>
 
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_horizontal"
+                android:layout_marginLeft="@dimen/request_dialog_margin"
+                android:layout_marginRight="@dimen/request_dialog_margin"
+                android:id="@+id/linearLayout"
+                android:layout_marginTop="85dp"
+                android:layout_below="@+id/categoryLayout"
+                android:layout_alignParentEnd="true">
 
-    </LinearLayout>
+                <Button
+                    android:id="@+id/accept"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/request_dialog_margin"
+                    android:text="Accept"
+                    android:textSize="@dimen/request_dialog_text_size"
+                    />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_below="@+id/categoryLayout"
-        android:layout_margin="@dimen/request_dialog_margin"
-        android:gravity="center_horizontal">
+                <Button
+                    android:id="@+id/decline"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/category"
+                    android:layout_margin="@dimen/request_dialog_margin"
+                    android:text="Decline"
+                    android:textSize="@dimen/request_dialog_text_size"
+                    />
+            </LinearLayout>
 
-        <Button
-            android:id="@+id/accept"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/request_dialog_margin"
-            android:text="Accept"
-            android:textSize="@dimen/request_dialog_text_size"
-            />
+        </RelativeLayout>
 
-        <Button
-            android:id="@+id/decline"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/category"
-            android:layout_margin="@dimen/request_dialog_margin"
-            android:text="Decline"
-            android:textSize="@dimen/request_dialog_text_size"
-            />
-    </LinearLayout>
-
-
+    </android.support.v7.widget.CardView>
 
 </RelativeLayout>

@@ -17,6 +17,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -70,11 +71,16 @@ public class ProviderTransactions extends Fragment {
                                 JSONObject jOb = jsonArray.getJSONObject(i);
                                 arrayOfItems.add(new ListData(jOb));
                             }
-                            myAdapter = new ProviderTransactionsAdapter(arrayOfItems);
+                            Collections.reverse(arrayOfItems);
+                            myAdapter = new ProviderTransactionsAdapter(arrayOfItems, getActivity());
                             myRecyclerView.setAdapter(myAdapter);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
+                    }
+                    @Override
+                    public void onError(String error) {
+                        Toast.makeText(getActivity(),error,Toast.LENGTH_LONG).show();
                     }
                 });
     }

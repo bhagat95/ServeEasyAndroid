@@ -42,7 +42,7 @@ public class PendingRequests extends Fragment implements RequestDetails.RequestD
     ListView requestsList;
     ArrayList<ListData> arrayOfItems;
     RequestsAdapter adapter;
-    String request_id = "",consumerAddress;
+    String request_id = "",consumerAddress,consumerPhno,dueDate;
     SwipeRefreshLayout swipeRefreshLayout;
 
     @Override
@@ -76,10 +76,12 @@ public class PendingRequests extends Fragment implements RequestDetails.RequestD
                 try {
                     request_id = arrayOfItems.get(i).jOb.getString("request_id");
                     consumerAddress = arrayOfItems.get(i).jOb.getString("address");
+                    consumerPhno = arrayOfItems.get(i).jOb.getString("consumer_phno");
+                    dueDate = arrayOfItems.get(i).jOb.getString("due_date");
                 }
                 catch (Exception e){
                 }
-                showDetails(i,consumerName,categoryName,distance,quantity,request_id,consumerAddress);
+                showDetails(i,consumerName,categoryName,distance,quantity,request_id,consumerAddress,consumerPhno,dueDate);
             }
         });
         swipeRefreshLayout = (SwipeRefreshLayout)v.findViewById(R.id.swipe_refresh_layout);
@@ -96,7 +98,7 @@ public class PendingRequests extends Fragment implements RequestDetails.RequestD
     }
 
 
-    private void showDetails(int position,String consumerName,String categoryName,String distance, String quantity,String request_id,String address) {
+    private void showDetails(int position,String consumerName,String categoryName,String distance, String quantity,String request_id,String address,String consumerPhno,String dueDate) {
         FragmentManager fm = getFragmentManager();
 
         Bundle args = new Bundle();
@@ -106,7 +108,10 @@ public class PendingRequests extends Fragment implements RequestDetails.RequestD
         args.putString("distance",distance);
         args.putString("request_id",request_id);
         args.putString("address",address);
+        args.putString("consumerPhno",consumerPhno);
+        args.putString("dueDate", dueDate);
         args.putInt("listItemPosition", position);
+
 
         RequestDetails details = RequestDetails.newInstance();
         details.setTargetFragment(this, 0);
@@ -132,7 +137,6 @@ public class PendingRequests extends Fragment implements RequestDetails.RequestD
             arrayOfItems.remove(position);
             requestsList.invalidateViews();
             //Log.d("newListSize", arrayOfItems.size()+"");
-
         }
     }
 
@@ -149,6 +153,10 @@ public class PendingRequests extends Fragment implements RequestDetails.RequestD
                     public void onSuccess(String response) {
                         Log.d("makeStatusDelivered",response);
                     }
+                    @Override
+                    public void onError(String error) {
+                        Toast.makeText(getActivity(),error,Toast.LENGTH_LONG).show();
+                    }
                 });
         //here, no notification will be sent, only transactions will move to transactions page for provider
     }
@@ -164,8 +172,13 @@ public class PendingRequests extends Fragment implements RequestDetails.RequestD
                     public void onSuccess(String response) {
                         Log.d("makeStatusCancelled",response);
                     }
+                    @Override
+                    public void onError(String error) {
+                        Toast.makeText(getActivity(),error,Toast.LENGTH_LONG).show();
+                    }
                 });
     }
+
 
     void getRequests() {
         Map<String, String> params = new HashMap<>();
@@ -190,6 +203,10 @@ public class PendingRequests extends Fragment implements RequestDetails.RequestD
                         }
                         adapter.notifyDataSetChanged();
                         swipeRefreshLayout.setRefreshing(false);
+                    }
+                    @Override
+                    public void onError(String error) {
+                        Toast.makeText(getActivity(),error,Toast.LENGTH_LONG).show();
                     }
                 });
     }

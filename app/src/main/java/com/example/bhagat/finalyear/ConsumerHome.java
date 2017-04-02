@@ -20,7 +20,9 @@ import android.view.View;
 import android.widget.Switch;
 import android.widget.TextView;
 
-public class ConsumerHome extends AppCompatActivity {
+import java.security.MessageDigest;
+
+public class ConsumerHome extends AppCompatActivity{
     DrawerLayout dlayout;
     ActionBarDrawerToggle toggle;
     FragmentManager manager;
@@ -30,7 +32,7 @@ public class ConsumerHome extends AppCompatActivity {
     NearbyServices nearbyServicesFragment;
     SharedPreferences sharedPreferences;
     TextView welcome;
-
+    ConsumerAccountSettings consumerAccountSettingsFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,8 +46,10 @@ public class ConsumerHome extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
+
         dlayout = (DrawerLayout) findViewById(R.id.mydrawerlayout);
         consumerTransactionsFragment = new ConsumerTransactions();
+        consumerAccountSettingsFragment = new ConsumerAccountSettings();
         //accountSettingsFragment = new AccountSettings();
         nearbyServicesFragment = new NearbyServices();
         toggle = new ActionBarDrawerToggle(this, dlayout, 0, 0);
@@ -81,12 +85,12 @@ public class ConsumerHome extends AppCompatActivity {
                     ft.commit();
 
                 }
-                /*else if (id == R.id.settings) {
+                else if (id == R.id.consumer_settings) {
                     FragmentTransaction ft = manager.beginTransaction();
-                    ft.replace(R.id.dummy, accountSettingsFragment);
+                    ft.replace(R.id.dummy_consumer, consumerAccountSettingsFragment);
                     //ft.replace(R.id.requests_fragment, accountSettingsFragment);
                     ft.commit();
-                }*/
+                }
 
                 //Todo: conditional statement to check if ProviderTransactions or ConsumerTransactions
                 else if (id == R.id.consumer_transactions) {
@@ -98,6 +102,7 @@ public class ConsumerHome extends AppCompatActivity {
                 else if(id == R.id.consumer_logout){
                     editor.putString("username", "guest");
                     editor.putBoolean("loggedin", false);
+                    editor.putString("radial_distance", "50");
                     editor.apply();
                     stopService(new Intent(ConsumerHome.this, ConsumerBackgroundService.class));
                     startActivity(new Intent(ConsumerHome.this, Login.class));
@@ -133,4 +138,5 @@ public class ConsumerHome extends AppCompatActivity {
         super.onPostCreate(savedInstanceState);
         toggle.syncState();
     }
+
 }

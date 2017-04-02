@@ -10,22 +10,7 @@
     android:id="@+id/category"
     tools:context=".Requests" >
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <Button
-            android:id="@+id/add"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:text="Add"/>
-        <EditText
-            android:id="@+id/textin"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_toLeftOf="@id/add"/>
-    </RelativeLayout>
+
     <LinearLayout
         android:id="@+id/container"
         android:layout_width="match_parent"

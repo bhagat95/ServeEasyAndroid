@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
@@ -65,6 +66,8 @@ public class ProviderBackgroundService extends Service {
         notification.setWhen(System.currentTimeMillis());
         notification.setContentTitle(categoryName);
         notification.setContentText(consumerName+" requested for "+quantity+" "+categoryName);
+        Uri sound = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.notification_sound);
+        notification.setSound(sound);
         Intent intent = new Intent(this, ProviderHome.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         notification.setContentIntent(pendingIntent);

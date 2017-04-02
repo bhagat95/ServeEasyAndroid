@@ -1,13 +1,16 @@
 package com.example.bhagat.finalyear;
 
 import android.content.Context;
+import android.media.Image;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -18,11 +21,11 @@ import java.util.ArrayList;
 public class ConsumerTransactionsAdapter extends RecyclerView.Adapter<ConsumerTransactionsAdapter.DataObjectHolder> {
 
     public ArrayList<ListData> arrayOfItems;
-
+    Context context;
     public static MyClickListener myClickListener;
 
-    public ConsumerTransactionsAdapter( ArrayList<ListData> listOfItems) { //ListData
-
+    public ConsumerTransactionsAdapter( ArrayList<ListData> listOfItems, Context context) { //ListData
+        this.context = context;
         this.arrayOfItems = listOfItems;
     }
 
@@ -40,9 +43,25 @@ public class ConsumerTransactionsAdapter extends RecyclerView.Adapter<ConsumerTr
         try {
             holder.providerName.setText(arrayOfItems.get(position).jOb.getString("provider_name"));
             holder.categoryName.setText(arrayOfItems.get(position).jOb.getString("category_name"));
-            holder.quantity.setText("Qty: "+ arrayOfItems.get(position).jOb.getString("quantity"));
-            holder.status.setText(arrayOfItems.get(position).jOb.getString("status"));
-            holder.date.setText(arrayOfItems.get(position).jOb.getString("date"));
+            holder.quantity.setText("Quantity: "+ arrayOfItems.get(position).jOb.getString("quantity"));
+            holder.date.setText("Ordered: " + arrayOfItems.get(position).jOb.getString("date"));
+
+// pending accepted delivered cancelled
+            //setting status image
+            String requestStatus = arrayOfItems.get(position).jOb.getString("status");
+            if(requestStatus.equals("pending")){
+                holder.status.setImageDrawable(ContextCompat.getDrawable(context,R.drawable.processing));
+            }
+            else if(requestStatus.equals("accepted")){
+                holder.status.setImageDrawable(ContextCompat.getDrawable(context,R.drawable.checked));
+            }
+            else if(requestStatus.equals("delivered")){
+                holder.status.setImageDrawable(ContextCompat.getDrawable(context,R.drawable.delivered));
+            }
+            else if(requestStatus.equals("cancelled")){
+                holder.status.setImageDrawable(ContextCompat.getDrawable(context,R.drawable.cancel));
+            }
+
             Log.d("transactions_quant", arrayOfItems.get(position).jOb.getString("quantity"));
 
         }
@@ -69,14 +88,15 @@ public class ConsumerTransactionsAdapter extends RecyclerView.Adapter<ConsumerTr
             implements View
             .OnClickListener {
         TextView providerName, categoryName, quantity;
-        TextView status,date;
+        TextView date;
+        ImageView status;
 
         public DataObjectHolder(View itemView) {
             super(itemView);
             providerName = (TextView) itemView.findViewById(R.id.provider_name);
             categoryName = (TextView) itemView.findViewById(R.id.category_name);
             quantity = (TextView) itemView.findViewById(R.id.quantity);
-            status = (TextView) itemView.findViewById(R.id.status);
+            status = (ImageView) itemView.findViewById(R.id.status);
             date = (TextView) itemView.findViewById(R.id.date);
             Log.i("LOG_TAG", "Adding Listener");
             itemView.setOnClickListener(this);

@@ -1,27 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+    <RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.example.bhagat.finalyear.MakeRequest">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:id="@+id/app_bar"
+        android:orientation="vertical"
+        android:background="@color/colorPrimary"/>
 
-    <include
-        layout="@layout/app_bar"
-        android:id="@+id/app_bar">
-    </include>
 
-
+<android.support.v7.widget.CardView
+    android:layout_centerInParent="true"
+    android:layout_width="wrap_content"
+    android:layout_margin="@dimen/activity_horizontal_margin"
+    android:layout_height="wrap_content">
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/merged_app_bar"
-        android:layout_below="@+id/app_bar"
-        android:background="@color/colorPrimary">
+        android:layout_height="match_parent">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Service Name"
+            android:textStyle="bold"
+            android:textColor="@color/colorPrimaryDark"
             android:id="@+id/service_name"
             android:textSize="@dimen/make_request_text_size"
             android:layout_marginTop="@dimen/make_request_margin"
@@ -33,47 +45,26 @@
             android:layout_height="wrap_content"
             android:text="Provider Name"
             android:id="@+id/provider_name"
-            android:layout_marginTop="@dimen/make_request_margin"
-            android:textSize="@dimen/make_request_text_size"
-            android:layout_below="@+id/service_name"
-            />
-        <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_marginTop="@dimen/activity_horizontal_margin"
+            android:textSize="15sp"
+            android:layout_below="@+id/service_name" />
+        <android.support.design.widget.FloatingActionButton
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_horizontal"
-            android:layout_marginTop="@dimen/make_request_margin"
-            android:id="@+id/call_provider_layout"
-            android:layout_below="@+id/provider_name"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="@dimen/make_request_margin">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Contact number"
-                android:layout_gravity="center_vertical"
-                android:id="@+id/provider_phno"
-                android:textSize="@dimen/make_request_text_size_small"
-                />
-
-            <ImageButton
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:contentDescription="@string/call_button"
-                android:src="@drawable/ic_call"
-                android:background="@color/colorPrimary"
-                android:id="@+id/call_button"
-                />
-
-        </LinearLayout>
-    </RelativeLayout>
-
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/merged_app_bar">
+            android:layout_margin="@dimen/activity_horizontal_margin"
+            android:src="@drawable/ic_call_white"
+            android:layout_centerInParent="true"
+            android:id="@+id/call_button"
+            android:layout_below="@id/provider_name"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Contact number"
+            android:layout_gravity="center_vertical"
+            android:id="@+id/provider_phno"
+            android:layout_centerInParent="true"
+            android:layout_below="@id/call_button"
+            android:textSize="@dimen/make_request_text_size_small" />
 
 
         <LinearLayout
@@ -81,6 +72,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_horizontal"
+            android:layout_below="@id/provider_phno"
             android:layout_marginTop="@dimen/make_request_margin"
             android:id="@+id/select_date_layout"
             android:layout_alignParentStart="true">
@@ -89,6 +81,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Due date:"
+                android:textStyle="bold"
+                android:textColor="@color/colorPrimaryDark"
                 android:id="@+id/pick_date"
                 android:layout_marginRight="40dp"
                 android:layout_gravity="center_vertical"
@@ -103,13 +97,12 @@
                 android:id="@+id/select_date"
                 android:layout_marginRight="50dp"/>
 
-            <ImageButton
+            <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:contentDescription="@string/call_button"
                 android:src="@drawable/ic_action_calendar_day"
-                android:id="@+id/pick_date_button"
-                />
+                android:id="@+id/pick_date_button" />
         </LinearLayout>
 
 
@@ -118,24 +111,22 @@
             android:layout_height="wrap_content"
             android:id="@+id/select_category"
             android:layout_below="@id/select_date_layout"
-            android:layout_centerHorizontal="true"
+            android:layout_centerInParent="true"
             android:layout_marginTop="@dimen/make_request_margin" />
 
 
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="center_horizontal"
             android:id="@+id/quantity_layout"
-            android:layout_below="@+id/select_category"
-            android:layout_marginTop="@dimen/make_request_margin"
-            android:layout_alignParentStart="true">
+            android:layout_centerInParent="true"
+            android:layout_below="@+id/select_category">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Qty : "
+                android:text="Quantity: "
                 android:id="@+id/qty"
                 android:textSize="@dimen/make_request_text_size_small"/>
 
@@ -144,50 +135,45 @@
                 android:layout_height="wrap_content"
                 android:inputType="number"
                 android:ems="2"
+                android:gravity="center"
+                android:textColor="@color/colorPrimaryDark"
                 android:id="@+id/quantity"/>
         </LinearLayout>
 
-        <LinearLayout
+        <EditText
             android:layout_width="match_parent"
+            android:layout_margin="@dimen/activity_horizontal_margin"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_horizontal"
-            android:id="@+id/address_layout"
-            android:layout_below="@+id/quantity_layout"
-            android:layout_marginTop="@dimen/make_request_margin"
-            android:layout_centerHorizontal="true">
+            android:inputType="textMultiLine"
+            android:layout_below="@id/quantity_layout"
+            android:layout_centerInParent="true"
+            android:maxLines="3"
+            android:id="@+id/address"
+            android:hint="Address" />
 
+        <android.support.v7.widget.CardView
+            android:layout_margin="@dimen/make_request_text_size"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:id="@+id/submit_button"
+            android:layout_below="@id/address"
+            android:layout_centerInParent="true"
+            app:cardCornerRadius="25dp"
+            app:cardBackgroundColor="@color/colorPrimaryDark">
             <TextView
-                android:text="Address: "
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="@dimen/make_request_text_size_small"
-                android:id="@+id/textView" />
+                android:text="SUBMIT"
+                android:textColor="@android:color/white"
+                android:layout_gravity="center"/>
+        </android.support.v7.widget.CardView>
 
-            <EditText
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:inputType="textMultiLine"
-                android:ems="10"
-                android:id="@+id/address"
-                android:hint="Type your address here" />
-
-        </LinearLayout>
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Submit"
-            android:id="@+id/submit"
-            android:layout_gravity="center_horizontal"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="20dp"
-            android:layout_below="@+id/address_layout"
-            android:background="@color/colorPrimary"
-            android:elevation="15dp"/>
 
     </RelativeLayout>
 
 
 
+</android.support.v7.widget.CardView>
+    </RelativeLayout>
 
-</RelativeLayout>
+</android.support.design.widget.CoordinatorLayout>

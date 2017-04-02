@@ -4,6 +4,8 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -12,7 +14,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,13 +36,17 @@ public class Login extends AppCompatActivity {
     TextView signup;
     EditText mobileNo, password;
     Button login;
-    RadioButton provider;
+    //RadioButton provider;
+    Button provider, consumer;
     ProgressDialog pDialog;
     boolean loggdedIn = false;
     boolean logInSuccessful = false;
     ArrayList<ListData> arrayOfItems;
     String userType;
     SharedPreferences.Editor editor;
+    boolean isProvider;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,26 +57,56 @@ public class Login extends AppCompatActivity {
         password = (EditText) findViewById(R.id.password);
         signup = (TextView) findViewById(R.id.signup);
         login = (Button) findViewById(R.id.login);
-        provider = (RadioButton) findViewById(R.id.login_provider);
+        provider = (Button) findViewById(R.id.login_provider);
+        consumer = (Button) findViewById(R.id.login_consumer);
 
-        signup.setTextColor(getResources().getColor(android.R.color.holo_blue_dark));
+        consumer.setTextColor(Color.WHITE);
+        consumer.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
+        provider.setTextColor(getResources().getColor(R.color.colorPrimaryDark));
+        provider.setBackgroundColor(Color.WHITE);
+
+
+        //signup.setTextColor(getResources().getColor(android.R.color.holo_blue_dark));
         arrayOfItems = new ArrayList<>();
         signup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(Login.this, Registration.class);
                 startActivity(intent);
+                overridePendingTransition(R.anim.enter, R.anim.exit);
             }
         });
         sp = PreferenceManager.getDefaultSharedPreferences(this);
         editor  = sp.edit();
-        loggdedIn = sp.getBoolean("loggedin", false);
+        loggdedIn = sp.getBoolean("loggedin",  false);
+
+        consumer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                consumer.setTextColor(Color.WHITE);
+                consumer.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
+                provider.setTextColor(getResources().getColor(R.color.colorPrimaryDark));
+                provider.setBackgroundColor(Color.WHITE);
+            }
+        });
+        provider.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                provider.setTextColor(Color.WHITE);
+                provider.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
+                consumer.setTextColor(getResources().getColor(R.color.colorPrimaryDark));
+                consumer.setBackgroundColor(Color.WHITE);
+            }
+        });
+
+
 
         /*This is used to keep the user logged in when the next time the user opens the app*/
         if (loggdedIn) {
+            editor.putString("username",UserDetails.getInstance().userName);
+            UserDetails.getInstance().userId = sp.getString("userId","0");
             String userType = sp.getString("userType","guest");
             if (userType.equals("provider")) {
-                editor.putString("username",UserDetails.getInstance().userName);
                 startActivity(new Intent(this, ProviderHome.class));
             } else {
                 startActivity(new Intent(this, ConsumerHome.class));
@@ -79,13 +114,19 @@ public class Login extends AppCompatActivity {
             finish();
         }
         login.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View view) {
+                ColorStateList mList = provider.getTextColors();
+                int color = mList.getDefaultColor();
+                if(color == Color.WHITE){
+                    isProvider = true;
+                }
                 if (mobileNo.getText().toString().length() == 0 || password.getText().toString().length() == 0) {
                     if (mobileNo.length() == 0) {
-                        Toast.makeText(Login.this, "Please enter your mobile no", Toast.LENGTH_LONG).show();
+                        Toast.makeText(Login.this, "Please anim_slide_in_right your mobile no", Toast.LENGTH_LONG).show();
                     } else if (password.length() == 0) {
-                        Toast.makeText(Login.this, "Please enter your password", Toast.LENGTH_LONG).show();
+                        Toast.makeText(Login.this, "Please anim_slide_in_right your password", Toast.LENGTH_LONG).show();
                     }
                 } else {
                     loginClicked();
@@ -121,8 +162,8 @@ public class Login extends AppCompatActivity {
                                 arrayOfItems.add(new ListData(jOb));
                                 String user_name = arrayOfItems.get(i).jOb.getString("user_name");
                                 String user_id = arrayOfItems.get(i).jOb.getString("user_id");
+                                if(isProvider){
 
-                                if(provider.isChecked()) {
                                     String isAvailable = arrayOfItems.get(i).jOb.getString("available");
                                     boolean available ;
                                     if(isAvailable.equals("1")){
@@ -134,6 +175,12 @@ public class Login extends AppCompatActivity {
                                     editor.putBoolean("available",available);
                                     editor.commit();
                                 }
+                                else{
+                                    String radial_distance = arrayOfItems.get(i).jOb.getString("radial_distance");
+                                    editor.putString("radial_distance",radial_distance);
+                                    editor.commit();
+                                }
+
 
                                 int row_count = arrayOfItems.get(i).jOb.getInt("row_count");
                                 if (row_count != 1) {
@@ -144,10 +191,12 @@ public class Login extends AppCompatActivity {
                                     editor.commit();
                                     UserDetails.getInstance().userName = user_name;
                                     UserDetails.getInstance().userId = user_id;
+                                    editor.putString("userId",user_id);
+                                    editor.commit();
                                     UserDetails.getInstance().consumerId = user_id;
                                     UserDetails.getInstance().providerId = user_id;
                                     UserDetails.getInstance().isProvider = true;
-                                    if (provider.isChecked()) {
+                                    if (isProvider) {
                                         userType = "provider";
                                     } else {
                                         userType = "consumer";
@@ -185,7 +234,7 @@ public class Login extends AppCompatActivity {
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<>();
-                params.put("user_type", (provider.isChecked() ? "provider" : "consumer"));
+                params.put("user_type", (isProvider)? "provider" : "consumer");
                 params.put("mobile_no", mobileNo.getText().toString());
                 params.put("password", password.getText().toString());
                 return params;

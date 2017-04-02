@@ -17,4 +17,8 @@
     <style name="Color1SwitchStyle">
         <item name="colorControlActivated">@android:color/holo_green_light</item>
     </style>
+
+    <style name="AppTheme.Button" parent="Base.Widget.AppCompat.Button">
+        <item name="colorButtonNormal">#f4f4f3</item>
+    </style>
 </resources>

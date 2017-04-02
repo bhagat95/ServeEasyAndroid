@@ -1,55 +1,60 @@
-
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    card_view:contentPadding="10dp"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:descendantFocusability="blocksDescendants"
-    android:orientation="horizontal"
     android:layout_margin="5dp">
     <!--android:weightSum="3"-->
 
-
-
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_margin="10dp"
-        android:layout_weight="1">
-        <!--android:layout_weight="2"   android:layout_width="0dp"-->
-        <TextView
-            android:id="@+id/service_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="ganjha"
-            android:textSize="20dp"
-            android:textStyle="bold"
-            android:layout_marginTop="10dp"/>
-        <!--android:layout_gravity="center_horizontal"-->
-
-        <TextView
-            android:id="@+id/provider_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="shashank"
-            android:textSize="17dp"
-            android:layout_marginTop="10dp"/>
-        <!--android:layout_gravity="center_horizontal"-->
-
-
-    </LinearLayout>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/distance"
         android:text="1km"
-        android:layout_margin="30dp"
+        android:layout_gravity="right"
+        android:layout_margin="20dp"
         android:layout_weight="0"/>
 
-</LinearLayout>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="70dp"
+        android:orientation="vertical">
+
+        <!--android:layout_weight="2"   android:layout_width="0dp"-->
+        <TextView
+            android:id="@+id/service_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ganjha"
+            android:textColor="@android:color/black"
+            android:textSize="20dp"
+            android:textStyle="bold" />
+        <!--android:layout_gravity="center_horizontal"-->
+
+        <TextView
+            android:id="@+id/provider_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:ellipsize="none"
+            android:text="shashank"
+            android:textSize="17sp" />
+        <!--android:layout_gravity="center_horizontal"-->
+
+
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/letter_image"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="8dp"
+         />
+
+</android.support.v7.widget.CardView>
 
 
 
