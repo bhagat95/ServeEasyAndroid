@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
@@ -66,7 +67,7 @@ public class ProviderBackgroundService extends Service {
         notification.setWhen(System.currentTimeMillis());
         notification.setContentTitle(categoryName);
         notification.setContentText(consumerName+" requested for "+quantity+" "+categoryName);
-        Uri sound = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.notification_sound);
+        Uri sound = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.freeze_sound);
         notification.setSound(sound);
         Intent intent = new Intent(this, ProviderHome.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -86,7 +87,8 @@ public class ProviderBackgroundService extends Service {
             backgroundService.start();
             isRunning = true;
         }
-        return super.onStartCommand(intent, flags, startId);
+
+        return START_STICKY;//super.onStartCommand(intent, flags, startId);
     }
 
 
@@ -150,7 +152,7 @@ public class ProviderBackgroundService extends Service {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_LONG).show();
+                        //Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_LONG).show();
                         Log.d("fetch_requests error",error.toString());
                     }
                 }
@@ -160,7 +162,7 @@ public class ProviderBackgroundService extends Service {
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<>();
-                params.put("provider_id", UserDetails.getInstance().providerId);
+                params.put("provider_id", UserDetails.getInstance().userId);
                 return params;
             }
         } ;
@@ -197,7 +199,7 @@ public class ProviderBackgroundService extends Service {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_LONG).show();
+                        //Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_LONG).show();
                         Log.d("markRequestSeen error",error.toString());
                     }
                 }

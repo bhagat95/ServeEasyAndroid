@@ -1,5 +1,6 @@
 package com.example.bhagat.finalyear;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -79,7 +80,6 @@ public class VolleyNetworkManager {
 
     public void makeRequest(final Map<String, String> params, String url, final Callback callback) //SomeCustomListener<String> listener) final Response.Listener<String> listener
     {
-        //update prefixURL
 
         StringRequest request = new StringRequest(Request.Method.POST, url,new Response.Listener<String>() {
             @Override

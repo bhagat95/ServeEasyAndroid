@@ -1,6 +1,7 @@
 package com.example.bhagat.finalyear;
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -69,7 +70,7 @@ public class NearbyServices extends Fragment implements ActivityCompat.OnRequest
         arrayOfItems = new ArrayList<>();
 
         getLocation();
-        getServices();
+
         requestsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -80,6 +81,7 @@ public class NearbyServices extends Fragment implements ActivityCompat.OnRequest
                             .putExtra("providerName",arrayOfItems.get(i).jOb.getString("provider_name"))
                             .putExtra("distance",arrayOfItems.get(i).jOb.getString("distance"))
                             .putExtra("providerPhno",arrayOfItems.get(i).jOb.getString("provider_phno")));
+                    getActivity().finish();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -104,27 +106,40 @@ public class NearbyServices extends Fragment implements ActivityCompat.OnRequest
 
     void getLocation(){
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-        Location location = locationManager.getLastKnownLocation(locationManager.getBestProvider(new Criteria(),
-                true));
-        if (location != null) {
-            onLocationChanged(location);
+        if ( ContextCompat.checkSelfPermission( getActivity(), Manifest.permission.ACCESS_FINE_LOCATION ) == PackageManager.PERMISSION_GRANTED ) {
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+            getServices();
+            Location location = locationManager.getLastKnownLocation(locationManager.getBestProvider(new Criteria(), true));
+            if (location != null) {
+                onLocationChanged(location);
+            }
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME, MIN_DISTANCE,
+                    locationListener );
         }
-        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
-            ;
+        else{
+            if (ContextCompat.checkSelfPermission(getActivity(),
+                    Manifest.permission.ACCESS_FINE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION},200);
+            }
         }
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME, MIN_DISTANCE,
-                locationListener );
+
     }
+
+
+
 
 
     ///volley
     void getServices() {
+        final ProgressDialog pDialog = new ProgressDialog(getActivity());
+        pDialog.setMessage("Loading...");
+        pDialog.show();
         Map<String, String> params = new HashMap<>();
         params.put("consumer_locx", latitude + "");
         params.put("consumer_locy", longitude + "");
-        Toast.makeText(getActivity(),latitude+" "+longitude,Toast.LENGTH_LONG).show();
-        Toast.makeText(getActivity(),sharedPreferences.getString("radial_distance","100"),Toast.LENGTH_LONG).show();
+        //Toast.makeText(getActivity(),latitude+" "+longitude,Toast.LENGTH_LONG).show();
+        //Toast.makeText(getActivity(),sharedPreferences.getString("radial_distance","100"),Toast.LENGTH_LONG).show();
         params.put("radial_distance",sharedPreferences.getString("radial_distance","100"));
         String url = UserDetails.getInstance().url + "fetch_services.php";
         VolleyNetworkManager.getInstance(getContext()).makeRequest(params,
@@ -138,6 +153,7 @@ public class NearbyServices extends Fragment implements ActivityCompat.OnRequest
                                 JSONObject jOb = jsonArray.getJSONObject(i);
                                 arrayOfItems.add(new ListData(jOb));
                             }
+                            pDialog.hide();
                         }
                         catch (Exception e){
                             e.printStackTrace();
@@ -147,20 +163,34 @@ public class NearbyServices extends Fragment implements ActivityCompat.OnRequest
                     }
                     @Override
                     public void onError(String error) {
+                        pDialog.hide();
                         Toast.makeText(getActivity(),error,Toast.LENGTH_LONG).show();
                     }
                 });
     }
 
+
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == 1) {
-            if (permissions.length == 1 &&
-                    permissions[0] == Manifest.permission.ACCESS_FINE_LOCATION &&
-                    grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            } else {
-                Toast.makeText(getActivity(),"Permission denied",Toast.LENGTH_LONG).show();
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case 200: {
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    getServices();
+                    Log.d("permission","granted");
+                    // permission was granted, yay! do the
+                    // calendar task you need to do.
+
+                } else {
+
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                }
+                return;
             }
+
+            // other 'switch' lines to check for other
+            // permissions this app might request
         }
     }
 

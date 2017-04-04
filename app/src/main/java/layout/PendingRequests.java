@@ -1,5 +1,6 @@
 package layout;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
@@ -71,7 +72,7 @@ public class PendingRequests extends Fragment implements RequestDetails.RequestD
                 String distance = distanceView.getText().toString();
 
                 TextView quantityView = (TextView)view.findViewById(R.id.quantity);
-                String quantity = quantityView.getText().toString();
+                String quantity = "Quantity:" + quantityView.getText().toString().substring(4, quantityView.getText().toString().length());
 
                 try {
                     request_id = arrayOfItems.get(i).jOb.getString("request_id");
@@ -112,12 +113,10 @@ public class PendingRequests extends Fragment implements RequestDetails.RequestD
         args.putString("dueDate", dueDate);
         args.putInt("listItemPosition", position);
 
-
         RequestDetails details = RequestDetails.newInstance();
         details.setTargetFragment(this, 0);
         details.setArguments(args);
         details.show(fm,"pendingDialogTag");
-
     }
 
 
@@ -142,19 +141,25 @@ public class PendingRequests extends Fragment implements RequestDetails.RequestD
 
 
     void makeRequestStatusDelivered(){
-        Toast.makeText(getActivity(),"Done clicked",Toast.LENGTH_LONG).show();
+
         Map<String, String> params = new HashMap<>();
         params.put("status","3");// move to transactions
         params.put("request_id",request_id);
         String url = UserDetails.getInstance().url + "update_request_status.php";
+        final ProgressDialog pDialog = new ProgressDialog(getActivity());
+        pDialog.setMessage("Loading...");
+        pDialog.show();
         VolleyNetworkManager.getInstance(getContext()).makeRequest(params, url,
                 new VolleyNetworkManager.Callback() {
                     @Override
                     public void onSuccess(String response) {
+                        pDialog.hide();
+                        Toast.makeText(getActivity(),"Request has moved to Transactions",Toast.LENGTH_SHORT).show();
                         Log.d("makeStatusDelivered",response);
                     }
                     @Override
                     public void onError(String error) {
+                        pDialog.hide();
                         Toast.makeText(getActivity(),error,Toast.LENGTH_LONG).show();
                     }
                 });
@@ -162,6 +167,9 @@ public class PendingRequests extends Fragment implements RequestDetails.RequestD
     }
 
     void makeRequestStatusCancelled(){
+        final ProgressDialog pDialog = new ProgressDialog(getActivity());
+        pDialog.setMessage("Loading...");
+        pDialog.show();
         Map<String, String> params = new HashMap<>();
         params.put("status","4"); // move to transactions
         params.put("request_id",request_id);
@@ -170,10 +178,13 @@ public class PendingRequests extends Fragment implements RequestDetails.RequestD
                 new VolleyNetworkManager.Callback() {
                     @Override
                     public void onSuccess(String response) {
+                        pDialog.hide();
                         Log.d("makeStatusCancelled",response);
+                        Toast.makeText(getActivity(),"Request cancelled and moved to Transactions",Toast.LENGTH_SHORT).show();
                     }
                     @Override
                     public void onError(String error) {
+                        pDialog.hide();
                         Toast.makeText(getActivity(),error,Toast.LENGTH_LONG).show();
                     }
                 });
@@ -181,6 +192,7 @@ public class PendingRequests extends Fragment implements RequestDetails.RequestD
 
 
     void getRequests() {
+
         Map<String, String> params = new HashMap<>();
         params.put("provider_id", UserDetails.getInstance().providerId);
         params.put("type","pending");

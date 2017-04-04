@@ -59,14 +59,33 @@
         android:src="@drawable/plus"
         android:layout_marginTop="@dimen/activity_horizontal_margin"
         android:layout_below="@id/tvcat_name"/>
-    <EditText
-        android:id="@+id/textin"
-        android:layout_marginEnd="@dimen/activity_horizontal_margin"
-        android:layout_width="match_parent"
+
+    <LinearLayout
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:id="@+id/textin"
         android:layout_alignParentLeft="true"
         android:layout_alignBottom="@id/add"
-        android:layout_toLeftOf="@id/add"/>
+        android:layout_toLeftOf="@id/add"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/category_name"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="6"
+            android:hint="Name"/>
+        <EditText
+            android:id="@+id/category_price"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="Price"
+            android:layout_weight="1"
+            android:inputType="number"/>
+
+    </LinearLayout>
 
     <ScrollView
         android:layout_width="match_parent"
@@ -89,6 +108,7 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
         android:layout_marginTop="13dp"
+
         android:src="@drawable/gps" />
 
     <TextView
@@ -97,6 +117,7 @@
         android:layout_toLeftOf="@id/update_location"
         android:text="Update Location"
         android:layout_margin="8dp"
+        android:layout_centerHorizontal="true"
         android:layout_alignBottom="@id/update_location"/>
 
 

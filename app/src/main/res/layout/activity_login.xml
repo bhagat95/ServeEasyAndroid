@@ -33,7 +33,7 @@
             android:textColorHint="@color/colorPrimaryDark"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textEmailAddress"
+            android:inputType="number"
             android:hint="Mobile Number" />
     </android.support.design.widget.TextInputLayout>
 

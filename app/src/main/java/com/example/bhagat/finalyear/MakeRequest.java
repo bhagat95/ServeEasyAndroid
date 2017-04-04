@@ -5,15 +5,20 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.LocationManager;
 import android.net.Uri;
+import android.os.Build;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.util.Pair;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -71,27 +76,27 @@ public class MakeRequest extends AppCompatActivity {
         serviceNameVal = getIntent().getStringExtra("serviceName");
         providerPhnoVal = getIntent().getStringExtra("providerPhno");
 
-        selectDate = (TextView)findViewById(R.id.select_date);
-        providerName = (TextView)findViewById(R.id.provider_name);
-        serviceName = (TextView)findViewById(R.id.service_name);
-        providerPhno = (TextView)findViewById(R.id.provider_phno);
-        quantity = (EditText)findViewById(R.id.quantity);
-        address = (EditText)findViewById(R.id.address);
+        selectDate = (TextView) findViewById(R.id.select_date);
+        providerName = (TextView) findViewById(R.id.provider_name);
+        serviceName = (TextView) findViewById(R.id.service_name);
+        providerPhno = (TextView) findViewById(R.id.provider_phno);
+        quantity = (EditText) findViewById(R.id.quantity);
+        address = (EditText) findViewById(R.id.address);
 
         providerName.setText(providerNameVal);
         serviceName.setText(serviceNameVal);
         providerPhno.setText(providerPhnoVal);
 
-        Toast.makeText(this,serviceIdVal +"",Toast.LENGTH_LONG).show();
+        //Toast.makeText(this,serviceIdVal +"",Toast.LENGTH_LONG).show();
 
-        submit  = (CardView) findViewById(R.id.submit_button);
+        submit = (CardView) findViewById(R.id.submit_button);
         callButton = (FloatingActionButton) findViewById(R.id.call_button);
         dueDate = (ImageView) findViewById(R.id.pick_date_button);
         selectCategory = (Spinner) findViewById(R.id.select_category);
 
         String date = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
 
-        Toast.makeText(this,"date" + date,Toast.LENGTH_LONG).show();
+        // Toast.makeText(this,"date" + date,Toast.LENGTH_LONG).show();
 
         //set current date
         java.util.Calendar calendar = java.util.Calendar.getInstance();
@@ -100,25 +105,24 @@ public class MakeRequest extends AppCompatActivity {
         day = calendar.get(java.util.Calendar.DAY_OF_MONTH);
 
 
-        dueDay = day;
-        dueMonth = month;
-        dueYear = year;
+        //dueDay = day;
+        //dueMonth = month;
+        //dueYear = year;
 
 
         //call
         callButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String phoneNumber = "tel:"+providerPhnoVal;
-                Intent callIntent = new Intent(Intent.ACTION_CALL, Uri.parse(phoneNumber));
-                if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
-                    Log.d("Call permission", "denied");
-                    return;
+
+                if (isPermissionGranted()) {
+                    call_action();
                 }
-                Log.d("Call", "success");
-                startActivity(callIntent);
             }
         });
+
+
+
         //set date
         dueDate.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -134,11 +138,37 @@ public class MakeRequest extends AppCompatActivity {
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                submitRequst();
+                if(dueDay == 0) {
+                    Toast.makeText(MakeRequest.this, "Please select due date", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if(address.getText().toString().trim().length() == 0) {
+                    Toast.makeText(MakeRequest.this, "Please enter address", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                submitRequest();
             }
         });
     }
 
+    public  boolean isPermissionGranted() {
+        if (Build.VERSION.SDK_INT >= 23) {
+            if (checkSelfPermission(android.Manifest.permission.CALL_PHONE)
+                    == PackageManager.PERMISSION_GRANTED) {
+                Log.v("TAG","Permission is granted");
+                return true;
+            } else {
+
+                Log.v("TAG","Permission is revoked");
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CALL_PHONE}, 1);
+                return false;
+            }
+        }
+        else { //permission is automatically granted on sdk<23 upon installation
+            Log.v("TAG","Permission is granted");
+            return true;
+        }
+    }
 
     @Override
     protected Dialog onCreateDialog(int id) {
@@ -176,7 +206,7 @@ public class MakeRequest extends AppCompatActivity {
                 url, new VolleyNetworkManager.Callback() {
                     @Override
                     public void onSuccess(String response) {
-                        Toast.makeText(getApplicationContext(),response,Toast.LENGTH_LONG).show();
+                        //Toast.makeText(getApplicationContext(),response,Toast.LENGTH_LONG).show();
                         Log.d("Spinner Response", response);
 
                         ArrayList<String> categoryArrayList = new ArrayList<>();
@@ -185,7 +215,7 @@ public class MakeRequest extends AppCompatActivity {
                             JSONObject jOb = new JSONObject(response);
                             jArr = jOb.getJSONArray("category_list");
                             for(int i=0; i<jArr.length(); i++){
-                                categoryArrayList.add(jArr.getJSONObject(i).getString("category_name"));
+                                categoryArrayList.add(jArr.getJSONObject(i).getString("category_name") + " - Rs "+jArr.getJSONObject(i).getString("category_price"));
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -217,7 +247,7 @@ public class MakeRequest extends AppCompatActivity {
                 });
     }
 
-    public  void  submitRequst() {
+    public  void  submitRequest() {
 
         String url = UserDetails.getInstance().url+"make_request.php";
 
@@ -243,13 +273,16 @@ public class MakeRequest extends AppCompatActivity {
 
 
 
-
+        final ProgressDialog pDialog = new ProgressDialog(this);
+        pDialog.setMessage("Loading...");
+        pDialog.show();
         VolleyNetworkManager.getInstance(getApplicationContext()).makeRequest(params,
                 url, new VolleyNetworkManager.Callback() {
                     @Override
                     public void onSuccess(String response) {
                         Log.d("Response123", response);
-                        //Toast.makeText(getApplicationContext(),response,Toast.LENGTH_LONG).show();
+                        pDialog.hide();
+                        Toast.makeText(getApplicationContext(),"Request made successfully.",Toast.LENGTH_LONG).show();
                         Intent intent = new Intent(getApplicationContext(),ConsumerHome.class);
                         startActivity(intent);
                         finish();
@@ -257,10 +290,49 @@ public class MakeRequest extends AppCompatActivity {
                     }
                     @Override
                     public void onError(String error) {
+                        pDialog.hide();
                         Toast.makeText(getApplicationContext(),error,Toast.LENGTH_LONG).show();
                     }
                 });
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent intent = new Intent(getApplicationContext(),ConsumerHome.class);
+        startActivity(intent);
+        finish();
+    }
 
+    public void call_action(){
+        //String phnum = etPhoneno.getText().toString();
+        String phno = "tel:" + providerPhnoVal;
+        Intent callIntent = new Intent(Intent.ACTION_CALL);
+        callIntent.setData(Uri.parse(phno));
+        try {
+            startActivity(callIntent);
+        }catch (Exception e){
+            Log.d("Permission denied",e.getMessage());
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+
+            case 1: {
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(getApplicationContext(), "Permission granted", Toast.LENGTH_SHORT).show();
+                    call_action();
+                } else {
+                    Toast.makeText(getApplicationContext(), "Permission denied", Toast.LENGTH_SHORT).show();
+                }
+                return;
+            }
+            // other 'case' lines to check for other
+            // permissions this app might request
+        }
+    }
 }

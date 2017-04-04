@@ -22,7 +22,7 @@ public class ConsumerTransactionsAdapter extends RecyclerView.Adapter<ConsumerTr
 
     public ArrayList<ListData> arrayOfItems;
     Context context;
-    public static MyClickListener myClickListener;
+
 
     public ConsumerTransactionsAdapter( ArrayList<ListData> listOfItems, Context context) { //ListData
         this.context = context;
@@ -43,23 +43,23 @@ public class ConsumerTransactionsAdapter extends RecyclerView.Adapter<ConsumerTr
         try {
             holder.providerName.setText(arrayOfItems.get(position).jOb.getString("provider_name"));
             holder.categoryName.setText(arrayOfItems.get(position).jOb.getString("category_name"));
-            holder.quantity.setText("Quantity: "+ arrayOfItems.get(position).jOb.getString("quantity"));
-            holder.date.setText("Ordered: " + arrayOfItems.get(position).jOb.getString("date"));
+            holder.quantity.setText("Qty: "+ arrayOfItems.get(position).jOb.getString("quantity"));
+            holder.date.setText( arrayOfItems.get(position).jOb.getString("date"));
 
 // pending accepted delivered cancelled
             //setting status image
             String requestStatus = arrayOfItems.get(position).jOb.getString("status");
             if(requestStatus.equals("pending")){
-                holder.status.setImageDrawable(ContextCompat.getDrawable(context,R.drawable.processing));
+                holder.status.setImageDrawable(ContextCompat.getDrawable(context,R.drawable.yellow_processing));
             }
             else if(requestStatus.equals("accepted")){
-                holder.status.setImageDrawable(ContextCompat.getDrawable(context,R.drawable.checked));
+                holder.status.setImageDrawable(ContextCompat.getDrawable(context,R.drawable.yellow_checked));
             }
             else if(requestStatus.equals("delivered")){
-                holder.status.setImageDrawable(ContextCompat.getDrawable(context,R.drawable.delivered));
+                holder.status.setImageDrawable(ContextCompat.getDrawable(context,R.drawable.green_tick));
             }
             else if(requestStatus.equals("cancelled")){
-                holder.status.setImageDrawable(ContextCompat.getDrawable(context,R.drawable.cancel));
+                holder.status.setImageDrawable(ContextCompat.getDrawable(context,R.drawable.red_cross));
             }
 
             Log.d("transactions_quant", arrayOfItems.get(position).jOb.getString("quantity"));
@@ -70,13 +70,8 @@ public class ConsumerTransactionsAdapter extends RecyclerView.Adapter<ConsumerTr
         }
     }
 
-    public void setOnItemClickListener(MyClickListener myClickListener) {
-        this.myClickListener = myClickListener;
-    }
 
-    public interface MyClickListener {
-        public void onItemClick(int position, View v);
-    }
+
 
     @Override
     public int getItemCount() {
@@ -105,7 +100,7 @@ public class ConsumerTransactionsAdapter extends RecyclerView.Adapter<ConsumerTr
 
         @Override
         public void onClick(View v) {
-         //   myClickListener.onItemClick(getAdapterPosition(), v);
+            //   myClickListener.onItemClick(getAdapterPosition(), v);
         }
     }
 

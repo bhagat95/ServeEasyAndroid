@@ -1,6 +1,16 @@
 package com.example.bhagat.finalyear;
 
+import android.Manifest;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.util.DiffUtil;
@@ -25,17 +35,23 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.security.MessageDigest;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
-public class OTPVerification extends AppCompatActivity {
+public class OTPVerification extends AppCompatActivity implements ActivityCompat.OnRequestPermissionsResultCallback,LocationListener{
     private ViewPagerAdapter adapter;
     private Button resendOTP, submit;
     private EditText inputOtp;
     private ProgressBar progressBar;
     private ImageButton btnEditMobile;
     private TextView txtEditMobile;
+    private LocationManager locationManager;
     private LinearLayout layoutEditMobile;
+    double latitude,longitude;
+    private static final long MIN_TIME = 400;
+    private static final float MIN_DISTANCE = 1000;
     RequestQueue requestQueue;
     String OTP;
     String userType, userName, mobileNo, userPassword, userAddress, loc_x, loc_y;
@@ -55,14 +71,16 @@ public class OTPVerification extends AppCompatActivity {
 
         requestQueue = Volley.newRequestQueue(getApplicationContext());
 
+        getLocation();
+
         Bundle bundle = getIntent().getBundleExtra("registrationDetailsBundle");
         userType = bundle.getString("user_type");
         userName = bundle.getString("name");
         mobileNo = bundle.getString("mobile_no");
         userPassword = bundle.getString("password");
         userAddress = bundle.getString("address");
-        loc_x = bundle.getString("loc_x");
-        loc_y = bundle.getString("loc_y");
+        loc_x = latitude+"";
+        loc_y = longitude+"";
 
         Log.d("OTPmobile", mobileNo);
         Log.d("OTPname", userName);
@@ -85,7 +103,7 @@ public class OTPVerification extends AppCompatActivity {
                 }
                 else {
                     if(inputOtp.getText().toString().trim().equals(OTP))
-                        register();
+                       register();
                     else {
                         Toast.makeText(OTPVerification.this, "Incorrect OTP", Toast.LENGTH_SHORT).show();
                     }
@@ -105,9 +123,11 @@ public class OTPVerification extends AppCompatActivity {
 
     void sendOTP(){
 
-        OTP = (mobileNo.hashCode()+"").substring(0,4);
+        OTP = (int)(Math.random()*9000)+1000+"";
         Log.d("OTP",OTP);
-
+        /*final ProgressDialog pDialog = new ProgressDialog(this);
+        pDialog.setMessage("Loading...");
+        pDialog.show();*/
         String url = "https://control.msg91.com/api/sendotp.php?authkey="+getResources().getString(R.string.API_KEY)+
                 "&mobile=91"+mobileNo+"&message=Your%20otp%20is%20"+OTP+"&sender=SRVESY&otp="+OTP;
         StringRequest request = new StringRequest( Request.Method.GET, url,
@@ -120,10 +140,12 @@ public class OTPVerification extends AppCompatActivity {
                             //arrayOfItems.add(new ListData(jOb));
                             String message = jOb.getString("message");
                             String type = jOb.getString("type");
+                            //pDialog.hide();
                             if(!type.equals("success"))
                                 Toast.makeText(getApplicationContext(), "An error has occured", Toast.LENGTH_SHORT).show();
                             //category_name, quantity, consumer_name, category_name
                         } catch (JSONException e) {
+                            //pDialog.hide();
                             e.printStackTrace();
                             Toast.makeText(getApplicationContext(), "An error has occured", Toast.LENGTH_SHORT).show();
                         }
@@ -133,6 +155,7 @@ public class OTPVerification extends AppCompatActivity {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
+                        //pDialog.hide();
                         Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_LONG).show();
                         Log.d("fetch_requests error",error.toString());
                     }
@@ -193,14 +216,18 @@ public class OTPVerification extends AppCompatActivity {
         params.put("loc_x", loc_x+"");
         params.put("loc_y", loc_y+"");
 
+        Log.d("Register", mobileNo);
+
         String url = UserDetails.getInstance().url + "se_register.php";
         VolleyNetworkManager.getInstance(getApplicationContext()).makeRequest(params, url,
                 new VolleyNetworkManager.Callback() {
                     @Override
                     public void onSuccess(String response) {
                         Log.d("registration response", response);
-                        Toast.makeText(getApplicationContext(), response, Toast.LENGTH_LONG).show();
-                        startActivity(new Intent(OTPVerification.this, Login.class));
+                        Toast.makeText(getApplicationContext(), "Registration Successful", Toast.LENGTH_LONG).show();
+                        Intent i = new Intent(OTPVerification.this, Login.class);
+                        i.putExtra("isNewUser","true");
+                        startActivity(i);
                         finish();
                     }
 
@@ -214,5 +241,58 @@ public class OTPVerification extends AppCompatActivity {
     }
 
 
+    LocationListener locationListener = new LocationListener(){
+        @Override
+        public void onLocationChanged(Location location) {
+        }
+        @Override
+        public void onStatusChanged(String s, int i, Bundle bundle) {
+        }
+        @Override
+        public void onProviderEnabled(String s) {
+        }
+        @Override
+        public void onProviderDisabled(String s) {
+        }
+    };
+    void getLocation(){
+        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        Location location = locationManager.getLastKnownLocation(locationManager.getBestProvider(new Criteria(), true));
+        if (location != null) {
+            onLocationChanged(location);
+        }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            ;
+        }
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME, MIN_DISTANCE,
+                locationListener );
+    }
 
+    @Override
+    public void onLocationChanged(Location location) {
+        latitude = location.getLatitude();
+        longitude = location.getLongitude();
+        UserDetails.getInstance().latitude = latitude+"";
+        UserDetails.getInstance().longitude = longitude+"";
+        Log.d("Longitude", longitude + " ");
+        //Toast.makeText(getActivity(),latitude +" "+longitude,Toast.LENGTH_LONG).show();
+        //latitude = location.getLatitude();
+        Log.d("Latitude", latitude + " ");
+    }
+
+    @Override
+    public void onStatusChanged(String s, int i, Bundle bundle) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String s) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String s) {
+
+    }
 }

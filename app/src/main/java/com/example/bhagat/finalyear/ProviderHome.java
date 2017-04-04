@@ -55,6 +55,19 @@ public class ProviderHome extends AppCompatActivity {
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         final SharedPreferences.Editor editor = sharedPreferences.edit();
         FragmentTransaction ft = manager.beginTransaction();
+
+        Intent intent = getIntent();
+        try {
+            //String isNewUser = intent.getStringExtra("isNewUser");
+            if (intent.getStringExtra("isNewUser").equals("true")) {
+                ft.replace(R.id.dummy, accountSettingsFragment);
+                ft.commit();
+            }
+        }catch (Exception e){
+            Log.d("Problem",e.getMessage());
+        }
+
+
         ft.replace(R.id.dummy,requestsFragment);
         ft.commit();
 
@@ -128,8 +141,11 @@ public class ProviderHome extends AppCompatActivity {
                 }
                 else if(id == R.id.provider_logout){
                     editor.putString("username", "guest");
+                    editor.putString("userType", "guest");
                     editor.putBoolean("loggedin", false);
                     editor.putBoolean("available",false);
+                    editor.putString("userId","0");
+                    editor.putString("radial_distance","50");
                     editor.commit();
                     stopService(new Intent(ProviderHome.this, ProviderBackgroundService.class));
                     startActivity(new Intent(ProviderHome.this, Login.class));
@@ -142,7 +158,7 @@ public class ProviderHome extends AppCompatActivity {
         });
         try {
             //temporary service testing
-            startService(new Intent(this, ProviderBackgroundService.class));
+            this.startService(new Intent(this, ProviderBackgroundService.class));
         }
         catch (Exception e) {
             Log.e("startService",e.toString());

@@ -8,7 +8,13 @@
     android:orientation="horizontal">
     <!--android:weightSum="3"-->
 
-
+    <ImageView
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:id="@+id/letter_image"
+        android:layout_gravity="center"
+        android:layout_margin="10dp"
+        />
 
 
     <LinearLayout
@@ -23,8 +29,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Shashank"
+            android:textColor="@android:color/black"
             android:textSize="20dp"
-            android:textStyle="bold"
             android:layout_marginTop="10dp"/>
         <!--android:layout_gravity="center_horizontal"-->
 

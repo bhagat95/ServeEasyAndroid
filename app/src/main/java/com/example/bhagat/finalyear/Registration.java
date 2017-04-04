@@ -55,7 +55,7 @@ public class Registration extends AppCompatActivity {
         password = (EditText) findViewById(R.id.registration_password);
         confirmPassword = (EditText) findViewById(R.id.registration_confirm_password);
         address = (EditText) findViewById(R.id.registration_address);
-        pinNo = (EditText) findViewById(R.id.registration_pin_no);
+        //pinNo = (EditText) findViewById(R.id.registration_pin_no);
         radioGroup = (RadioGroup) findViewById(R.id.registration_radio_group);
         radioConsumer = (RadioButton) findViewById(R.id.registration_consumer);
         radioProvider = (RadioButton) findViewById(R.id.registration_provider);
@@ -65,7 +65,7 @@ public class Registration extends AppCompatActivity {
             public void onClick(View view) {
                 user = new User(name.getText().toString(), mobileNo.getText().toString(),
                         password.getText().toString(), confirmPassword.getText().toString(),
-                        address.getText().toString(), pinNo.getText().toString(), (radioProvider.isChecked() ? "provider" : "consumer"));
+                        address.getText().toString(), (radioProvider.isChecked() ? "provider" : "consumer"));
                 //Log.d("radioprovider", radioProvider.isChecked() + "");
                 registerUser();
             }
@@ -89,7 +89,6 @@ public class Registration extends AppCompatActivity {
         String password = user.password;
         String confirmPassword = user.confirmPassword;
         String phone = user.mobileNo;
-        String pinNo = user.pinNo;
 
         if (user.name.length() == 0) {
             Toast.makeText(this, "Please enter your name", Toast.LENGTH_LONG).show();
@@ -107,10 +106,7 @@ public class Registration extends AppCompatActivity {
             Toast.makeText(this, "Please enter your address", Toast.LENGTH_LONG).show();
             return false;
         }
-        if (user.pinNo.length() == 0) {
-            Toast.makeText(this, "Please enter your pin no", Toast.LENGTH_LONG).show();
-            return false;
-        }
+
         if (!password.equals(confirmPassword)) {
             Toast.makeText(this, "Password and Confirm password do not match. Please try again", Toast.LENGTH_LONG).show();
             return false;
@@ -119,16 +115,16 @@ public class Registration extends AppCompatActivity {
             Toast.makeText(this, "Please enter a valid mobile no", Toast.LENGTH_LONG).show();
             return false;
         }
-        if (pinNo.length() != 6) {
-            Toast.makeText(this, "Please enter a valid pin no", Toast.LENGTH_LONG).show();
-            return false;
-        }
+
         return true;
     }
 
 
     public void checkMobileNoAvailibility() {
         //Toast.makeText(this,"check mobile entry true" + isMobileNoAvaialble,Toast.LENGTH_LONG).show();
+        final ProgressDialog pDialog = new ProgressDialog(this);
+        pDialog.setMessage("Loading...");
+        pDialog.show();
         Map<String, String> params = new HashMap<>();
         params.put("mobile_no", user.mobileNo);
         params.put("user_type", user.userType);
@@ -138,25 +134,28 @@ public class Registration extends AppCompatActivity {
                     @Override
                     public void onSuccess(String response) {
                         try {
+                            pDialog.hide();
                             if (response.equals("fail")) {
                                 isMobileNoAvaialble = false;
                                 Toast.makeText(Registration.this, "Sorry, this mobile no is already registered.                                                                 Try again.", Toast.LENGTH_LONG).show();
                             } else {
                                 isMobileNoAvaialble = true;
-
+                                callOTPVerification();
                                 //Log.d(TAG+"findPlaceCoordinates","calling");
-                                findPlaceCoordinates();
+                                //findPlaceCoordinates();
 
 
                             }
                         } catch (Exception e) {
                             //isMobileNoAvaialble = false;
+                            pDialog.hide();
                         }
 
                     }
 
                     @Override
                     public void onError(String error) {
+                        pDialog.hide();
                         Toast.makeText(getApplicationContext(),error,Toast.LENGTH_LONG).show();
                     }
                 });
@@ -188,7 +187,6 @@ public class Registration extends AppCompatActivity {
                             placeCoordinates = true;
 
                             //Log.d(TAG+"callOTPVerification","calling");
-                            callOTPVerification();
 
 
                         } catch (Exception e) {
@@ -213,12 +211,12 @@ public class Registration extends AppCompatActivity {
         bundle.putString("mobile_no", user.mobileNo);
         bundle.putString("password", user.password);
         bundle.putString("address", user.address);
-        bundle.putString("loc_x", loc_x+"");
-        bundle.putString("loc_y", loc_y+"");
+
         Log.d("CallOTPmobile",user.mobileNo+" "+bundle.getString("mobile_no"));
         Intent i = new Intent(Registration.this,OTPVerification.class);
         i.putExtra("registrationDetailsBundle",bundle);
         startActivity(i);
+        finish();
     }
 
 

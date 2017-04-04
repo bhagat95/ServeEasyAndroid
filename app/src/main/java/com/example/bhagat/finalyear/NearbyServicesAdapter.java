@@ -15,6 +15,7 @@ import com.amulyakhare.textdrawable.util.ColorGenerator;
 import org.json.JSONException;
 
 import java.util.List;
+import java.util.Random;
 
 import static android.graphics.Color.GREEN;
 
@@ -27,6 +28,8 @@ public class NearbyServicesAdapter extends ArrayAdapter<ListData>{
     LayoutInflater mInflater;
     List<ListData> objects ;
     ColorGenerator generator; // or use DEFAULT
+
+    String randomColor[]={"#2B60DE","#0070FF","#4169E1","#0038A8",	"#3284BF"};
 
     public NearbyServicesAdapter(Context context, int resource, List<ListData> objects) {
         super(context, resource, objects);
@@ -50,8 +53,8 @@ public class NearbyServicesAdapter extends ArrayAdapter<ListData>{
         generator =   ColorGenerator.MATERIAL;
         try {
             String firstLetter = objects.get(position).jOb.getString("service_name").charAt(0)+"";
-            int color = generator.getRandomColor();
-            //int color = generator.getColor(firstLetter);
+            //int color = generator.getRandomColor();
+            int color = Color.parseColor(randomColor[(new Random().nextInt(5))]);//.getColor(firstLetter);
             TextDrawable drawable = TextDrawable.builder().beginConfig().width(40).height(40).endConfig().buildRoundRect(firstLetter.toUpperCase(),color,4);
             letterImage.setImageDrawable(drawable);
             serviceName.setText(objects.get(position).jOb.getString("service_name"));

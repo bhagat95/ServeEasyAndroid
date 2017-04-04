@@ -1,5 +1,6 @@
 package layout;
 
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -148,6 +149,9 @@ public class ActiveRequests extends Fragment implements RequestDetails.RequestDi
     }
 
     public void makeRequestStatusPending(){
+        final ProgressDialog pDialog = new ProgressDialog(getActivity());
+        pDialog.setMessage("Loading...");
+        pDialog.show();
         Map<String, String> params = new HashMap<>();
         params.put("status","2");
         params.put("request_id",request_id);
@@ -156,18 +160,25 @@ public class ActiveRequests extends Fragment implements RequestDetails.RequestDi
                 new VolleyNetworkManager.Callback() {
                     @Override
                     public void onSuccess(String response) {
+                        pDialog.hide();
+                        Toast.makeText(getActivity(),"Request has moved to Pending",Toast.LENGTH_SHORT).show();
                         Log.d("makeStatusCancelled",response);
                     }
 
                     @Override
                     public void onError(String error) {
+                        pDialog.hide();
                         Toast.makeText(getActivity(),error,Toast.LENGTH_LONG).show();
                     }
                 });
+
     }
 
 
     void makeRequestStatusCancelled(){
+        final ProgressDialog pDialog = new ProgressDialog(getActivity());
+        pDialog.setMessage("Loading...");
+        pDialog.show();
         Map<String, String> params = new HashMap<>();
         params.put("status","4");
         params.put("request_id",request_id);
@@ -176,10 +187,13 @@ public class ActiveRequests extends Fragment implements RequestDetails.RequestDi
                 new VolleyNetworkManager.Callback() {
                     @Override
                     public void onSuccess(String response) {
+                        pDialog.hide();
+                        Toast.makeText(getActivity(),"Request cancelled and moved to Transactions",Toast.LENGTH_SHORT).show();
                         Log.d("makeStatusCancelled",response);
                     }
                     @Override
                     public void onError(String error) {
+                        pDialog.hide();
                         Toast.makeText(getActivity(),error,Toast.LENGTH_LONG).show();
                     }
                 });
@@ -192,6 +206,7 @@ public class ActiveRequests extends Fragment implements RequestDetails.RequestDi
 
 
     void getRequests(){
+
         swipeRefreshLayout.setRefreshing(true);
         Map<String, String> params = new HashMap<>();
         params.put("provider_id", UserDetails.getInstance().providerId);
@@ -201,6 +216,7 @@ public class ActiveRequests extends Fragment implements RequestDetails.RequestDi
                 new VolleyNetworkManager.Callback() {
                     @Override
                     public void onSuccess(String response) {
+
                         Log.d("ActiveRequests response", response);
                         try {
                             if(arrayOfItems!=null)
@@ -218,6 +234,7 @@ public class ActiveRequests extends Fragment implements RequestDetails.RequestDi
                     }
                     @Override
                     public void onError(String error) {
+
                         Toast.makeText(getActivity(),error,Toast.LENGTH_LONG).show();
                     }
                 });

@@ -35,6 +35,7 @@
         </activity>
         <activity
             android:name=".Registration"
+            android:launchMode="singleTop"
             android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -42,6 +43,7 @@
         </activity>
         <activity
             android:name=".MakeRequest"
+            android:launchMode="singleTop"
             android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -51,6 +53,7 @@
         <!-- android:windowSoftInputMode="adjustPan"  Prevents keyboard from pushing widgets upward -->
         <activity
             android:name=".ProviderHome"
+            android:launchMode="singleTop"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan">
 
@@ -61,16 +64,22 @@
         </activity>
         <activity
             android:name=".Login"
+            android:launchMode="singleTop"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name=".ConsumerHome"
+            android:launchMode="singleTop"
             android:screenOrientation="portrait"></activity>
+
+        <activity android:name=".OTPVerification"
+            android:screenOrientation="portrait"
+            android:launchMode="singleTop"
+            ></activity>
 
         <service
             android:name=".ProviderBackgroundService"
@@ -81,7 +90,7 @@
             android:enabled="true"
             android:exported="true" />
 
-        <activity android:name=".OTPVerification"></activity>
+
 
         <receiver android:name=".SMSReceiver">
             <intent-filter>

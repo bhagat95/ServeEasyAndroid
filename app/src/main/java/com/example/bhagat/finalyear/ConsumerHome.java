@@ -101,9 +101,12 @@ public class ConsumerHome extends AppCompatActivity{
                 }
                 else if(id == R.id.consumer_logout){
                     editor.putString("username", "guest");
+                    editor.putString("userType", "guest");
                     editor.putBoolean("loggedin", false);
-                    editor.putString("radial_distance", "50");
-                    editor.apply();
+                    editor.putBoolean("available",false);
+                    editor.putString("userId","0");
+                    editor.putString("radial_distance","50");
+                    editor.commit();
                     stopService(new Intent(ConsumerHome.this, ConsumerBackgroundService.class));
                     startActivity(new Intent(ConsumerHome.this, Login.class));
                     finish();
@@ -115,7 +118,7 @@ public class ConsumerHome extends AppCompatActivity{
         });
         try {
             //temporary service testing
-            startService(new Intent(this, ConsumerBackgroundService.class));
+            this.startService(new Intent(this, ConsumerBackgroundService.class));
         }
         catch (Exception e) {
             Log.e("startService",e.toString());

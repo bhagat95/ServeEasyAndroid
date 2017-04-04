@@ -1,5 +1,6 @@
 package com.example.bhagat.finalyear;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
@@ -98,8 +99,11 @@ public class ConsumerTransactions extends Fragment {
 
     void getDataSet() {
         Map<String, String> params = new HashMap<>();
-        params.put("consumer_id",UserDetails.getInstance().consumerId);
-        Toast.makeText(getActivity(),UserDetails.getInstance().consumerId+"",Toast.LENGTH_LONG).show();
+        params.put("consumer_id",UserDetails.getInstance().userId);
+      //  Toast.makeText(getActivity(),UserDetails.getInstance().consumerId+"",Toast.LENGTH_LONG).show();
+        final ProgressDialog pDialog = new ProgressDialog(getActivity());
+        pDialog.setMessage("Loading...");
+        pDialog.show();
         String url = UserDetails.getInstance().url + "fetch_consumer_transactions.php";
         VolleyNetworkManager.getInstance(getContext()).makeRequest(params,
                 url, new VolleyNetworkManager.Callback() {
@@ -112,8 +116,9 @@ public class ConsumerTransactions extends Fragment {
                                 JSONObject jOb = jsonArray.getJSONObject(i);
                                 arrayOfItems.add(new ListData(jOb));
                             }
+                            pDialog.hide();
                             //Collections.reverse(arrayOfItems);
-                            myAdapter = new ConsumerTransactionsAdapter(arrayOfItems, getActivity());
+                            myAdapter = new ConsumerTransactionsAdapter(arrayOfItems,getActivity());
                             myRecyclerView.setAdapter(myAdapter);
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -121,6 +126,7 @@ public class ConsumerTransactions extends Fragment {
                     }
                     @Override
                     public void onError(String error) {
+                        pDialog.hide();
                         Toast.makeText(getActivity(),error,Toast.LENGTH_LONG).show();
                     }
                 });

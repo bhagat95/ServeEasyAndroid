@@ -16,6 +16,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.util.Pair;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -49,15 +50,14 @@ import static android.content.Context.CONNECTIVITY_SERVICE;
  * Improved by bhagat on 10/28/16.
  */
 public class AccountSettings extends Fragment implements ActivityCompat.OnRequestPermissionsResultCallback,LocationListener {
-    ArrayList<String> categoryName;
+    ArrayList<Pair<String, String> > categoryDetails;
     EditText textIn;
     Button buttonSave;
     FloatingActionButton buttonAdd;
     ImageView updateLocation;
     LinearLayout container;
-    EditText service_name;
+    EditText service_name, categoryPrice;
     TextView tvcategoryName;
-    ProgressDialog pDialog;
     static String SERVICE_NAME = "";
     double latitude,longitude;
 
@@ -75,19 +75,20 @@ public class AccountSettings extends Fragment implements ActivityCompat.OnReques
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         arrayOfItems = new ArrayList<>();
-        categoryName = new ArrayList<>();
+        categoryDetails = new ArrayList<>();
 
         updateLocation = (ImageView) getActivity().findViewById(R.id.update_location);
         service_name = (EditText) getActivity().findViewById(R.id.etservice_name);
         tvcategoryName = (TextView) getActivity().findViewById(R.id.tvcat_name);
         buttonSave = (Button) getActivity().findViewById(R.id.buttonSave);
-        textIn = (EditText) getActivity().findViewById(R.id.textin);
+        textIn = (EditText) getActivity().findViewById(R.id.category_name);
+        categoryPrice = (EditText) getActivity().findViewById(R.id.category_price);
         buttonAdd = (FloatingActionButton) getActivity().findViewById(R.id.add);
         container = (LinearLayout) getActivity().findViewById(R.id.container);
 
         getLocation();
         getProviderServices();
-        categoryName.clear();
+        categoryDetails.clear();
 
 
         updateLocation.setOnClickListener(new View.OnClickListener() {
@@ -97,17 +98,26 @@ public class AccountSettings extends Fragment implements ActivityCompat.OnReques
                 params.put("provider_id", UserDetails.getInstance().providerId);
                 params.put("loc_x", latitude+"");
                 params.put("loc_y", longitude+"");
-                Toast.makeText(getActivity(),latitude +" "+longitude,Toast.LENGTH_LONG).show();
+
+                final ProgressDialog pDialog = new ProgressDialog(getActivity());
+                pDialog.setMessage("Loading...");
+                pDialog.show();
+
                 String url = UserDetails.getInstance().url + "update_location.php";
                 VolleyNetworkManager.getInstance(getContext()).makeRequest(params,
                         url, new VolleyNetworkManager.Callback() {
                             @Override
                             public void onSuccess(String response) {
+                                pDialog.dismiss();
+                                Toast.makeText(getActivity(),"Current Location Updated",Toast.LENGTH_LONG).show();
                                 Log.d("RESPONSE", response);
+
                             }
                             @Override
                             public void onError(String error) {
+                                pDialog.dismiss();
                                 Toast.makeText(getActivity(),error,Toast.LENGTH_LONG).show();
+
                             }
                         });
             }
@@ -120,55 +130,81 @@ public class AccountSettings extends Fragment implements ActivityCompat.OnReques
                         (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 final View addView = layoutInflater.inflate(R.layout.remove_category, null);
                 TextView textOut = (TextView) addView.findViewById(R.id.textout);
-                textOut.setText(textIn.getText().toString());
-                Button buttonRemove = (Button) addView.findViewById(R.id.remove);
-                buttonRemove.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        ((LinearLayout) addView.getParent()).removeView(addView);
+                TextView categoryPriceTextView = (TextView) addView.findViewById(R.id.category_price_textout);
+                if(textIn.getText().toString().trim().length() == 0 || categoryPrice.getText().toString().trim().length() == 0){
+                    Toast.makeText(getActivity(),"Please enter complete details",Toast.LENGTH_LONG).show();
+                }
+                    else{
+                        textOut.setText(textIn.getText().toString());
+                        categoryPriceTextView.setText(categoryPrice.getText().toString());
+                        ImageView buttonRemove = (ImageView) addView.findViewById(R.id.remove);
+                        buttonRemove.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                ((LinearLayout) addView.getParent()).removeView(addView);
+                            }
+                        });
+                        container.addView(addView);
+                        Toast.makeText(getActivity(),textIn.getText().toString()  + " added",Toast.LENGTH_LONG).show();
                     }
-                });
-                container.addView(addView);
-            }
+                }
         });
         buttonSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 SERVICE_NAME = service_name.getText().toString();
+
+                categoryDetails.clear();
+
                 for (int i = 0; i < container.getChildCount(); i++) {
-                    RelativeLayout temp = (RelativeLayout) container.getChildAt(i);
+                    LinearLayout temp = (LinearLayout) container.getChildAt(i);
                     TextView tvCategory = (TextView) temp.findViewById(R.id.textout);
-                    categoryName.add(tvCategory.getText().toString() + "");
+                    TextView tvPrice = (TextView) temp.findViewById(R.id.category_price_textout);
+                    categoryDetails.add(Pair.create(tvCategory.getText().toString() + "", tvPrice.getText().toString()));
                 }
+
                 postRequest();
             }
         });
     }
     public void postRequest() {
+
+        final ProgressDialog pDialog = new ProgressDialog(getActivity());
+        pDialog.setMessage("Loading...");
+        pDialog.show();
         Map<String, String> params = new HashMap<>();
         params.put("providerID", UserDetails.getInstance().providerId);
         params.put("serviceName", SERVICE_NAME);
-        params.put("noOfCategories", categoryName.size() + "");
-        for (int i = 0; i < categoryName.size(); i++) {
-            params.put("category" + i, categoryName.get(i));
-            Log.d("category", categoryName.get(i));
+        params.put("noOfCategories", categoryDetails.size() + "");
+        for (int i = 0; i < categoryDetails.size(); i++) {
+            params.put("category" + i, categoryDetails.get(i).first);
+            params.put("price" + i,  categoryDetails.get(i).second);
+            Log.d("category123", categoryDetails.get(i).first+" "+categoryDetails.get(i).second);
         }
-        categoryName.clear();
+        categoryDetails.clear();
         String url = UserDetails.getInstance().url + "se_addService.php";
         VolleyNetworkManager.getInstance(getContext()).makeRequest(params,
                 url, new VolleyNetworkManager.Callback() {
                     @Override
                     public void onSuccess(String response) {
                         Log.d("RESPONSE", response);
+                        pDialog.hide();
+                        if(response.equals("success")){
+                            Toast.makeText(getActivity(),"Details saved successfully",Toast.LENGTH_LONG).show();
+                        }
                     }
 
                     @Override
                     public void onError(String error) {
+                        pDialog.hide();
                         Toast.makeText(getActivity(),error,Toast.LENGTH_LONG).show();
                     }
                 });
     }
     public void getProviderServices(){
+        final ProgressDialog pDialog = new ProgressDialog(getActivity());
+        pDialog.setMessage("Loading...");
+        pDialog.show();
         Map<String,String> params = new HashMap<>();
         params.put("provider_id",UserDetails.getInstance().providerId);
         String url = UserDetails.getInstance().url + "get_provider_services.php";
@@ -178,22 +214,33 @@ public class AccountSettings extends Fragment implements ActivityCompat.OnReques
                     public void onSuccess(String response) {
                         if(response != null){
                             try {
+                                pDialog.hide();
                                 JSONArray jsonArray = new JSONArray(response);
                                 JSONObject jOb1 = jsonArray.getJSONObject(0);
                                 String provider_service_name = jOb1.getString("service_name");
                                 service_name.setText(provider_service_name);
                                 if(jsonArray.length() >= 2){
                                     JSONObject jOb2 = jsonArray.getJSONObject(1);
-                                    for(int i = 1 ; i <= jOb2.length();i++){
-                                        categoryName.add(jOb2.getString("cat" + i));
+                                    categoryDetails.clear();
+                                    Log.d("categoryDetails0",jOb2.length()+"");
+                                    Log.d("categoryDetails1",jOb2.getString("price1"));
+                                    for(int i = 1 ; i <= jOb2.length()/2;i++){
+                                        //Log.d("categoryDetails4","haha");
+                                        categoryDetails.add(Pair.create(jOb2.getString("cat" + i), jOb2.getString("price" + i)));
+                                        Log.d("categoryDetails2",jOb2.getString("price"+i));
+                                        Log.d("categoryDetails3",categoryDetails.get(i-1).first + " " + categoryDetails.get(i-1).second );
                                     }
+                                    Log.d("categoryDetails5",categoryDetails.size()+"");
                                     LayoutInflater layoutInflater =
                                             (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                                    for(int i = 0 ; i < categoryName.size();i++){
+
+                                    for(int i = 0 ; i < categoryDetails.size();i++){
                                         final View addView = layoutInflater.inflate(R.layout.remove_category, null);
                                         TextView textOut = (TextView) addView.findViewById(R.id.textout);
-                                        textOut.setText(categoryName.get(i));
-                                        Button buttonRemove = (Button) addView.findViewById(R.id.remove);
+                                        TextView textOutPrice = (TextView) addView.findViewById(R.id.category_price_textout);
+                                        textOut.setText(categoryDetails.get(i).first);
+                                        textOutPrice.setText(categoryDetails.get(i).second);
+                                        ImageView buttonRemove = (ImageView) addView.findViewById(R.id.remove);
                                         buttonRemove.setOnClickListener(new View.OnClickListener() {
                                             @Override
                                             public void onClick(View v) {
@@ -206,13 +253,14 @@ public class AccountSettings extends Fragment implements ActivityCompat.OnReques
                                 }
                             }
                             catch (Exception e){
-
+                                pDialog.hide();
                             }
                         }
                     }
                     @Override
                     public void onError(String error) {
                         Toast.makeText(getActivity(),error,Toast.LENGTH_LONG).show();
+                        pDialog.hide();
                     }
                 });
     }
@@ -235,6 +283,23 @@ public class AccountSettings extends Fragment implements ActivityCompat.OnReques
 
     void getLocation(){
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+        if ( ContextCompat.checkSelfPermission( getActivity(), Manifest.permission.ACCESS_FINE_LOCATION ) == PackageManager.PERMISSION_GRANTED ) {
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+        }
+        else{
+            if (ContextCompat.checkSelfPermission(getActivity(),
+                    Manifest.permission.ACCESS_FINE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED) {
+                // Should we show an explanation?
+                if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),
+                        Manifest.permission.ACCESS_FINE_LOCATION)) {
+                    ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION},200);
+                } else {
+                    ActivityCompat.requestPermissions(getActivity(),
+                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 200);
+                }
+            }
+        }
         Location location = locationManager.getLastKnownLocation(locationManager.getBestProvider(new Criteria(),
                 true));
         if (location != null) {

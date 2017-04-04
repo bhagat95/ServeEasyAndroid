@@ -48,16 +48,16 @@ public class ProviderTransactionsAdapter extends RecyclerView
             //setting status image
             String requestStatus = arrayOfItems.get(position).jOb.getString("status");
             if(requestStatus.equals("pending")){
-                holder.status.setImageDrawable(ContextCompat.getDrawable(context,R.drawable.processing));
+                holder.status.setImageDrawable(ContextCompat.getDrawable(context,R.drawable.yellow_processing));
             }
             else if(requestStatus.equals("accepted")){
-                holder.status.setImageDrawable(ContextCompat.getDrawable(context,R.drawable.checked));
+                holder.status.setImageDrawable(ContextCompat.getDrawable(context,R.drawable.yellow_checked));
             }
             else if(requestStatus.equals("delivered")){
-                holder.status.setImageDrawable(ContextCompat.getDrawable(context,R.drawable.delivered));
+                holder.status.setImageDrawable(ContextCompat.getDrawable(context,R.drawable.green_tick));
             }
             else if(requestStatus.equals("cancelled")){
-                holder.status.setImageDrawable(ContextCompat.getDrawable(context,R.drawable.cancel));
+                holder.status.setImageDrawable(ContextCompat.getDrawable(context,R.drawable.red_cross));
             }
 
 
@@ -101,7 +101,7 @@ public class ProviderTransactionsAdapter extends RecyclerView
         }
         @Override
         public void onClick(View v) {
-            myClickListener.onItemClick(getAdapterPosition(), v);
+//            myClickListener.onItemClick(getAdapterPosition(), v);
         }
     }
 

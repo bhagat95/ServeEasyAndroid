@@ -103,13 +103,25 @@ public class Login extends AppCompatActivity {
 
         /*This is used to keep the user logged in when the next time the user opens the app*/
         if (loggdedIn) {
-            editor.putString("username",UserDetails.getInstance().userName);
+            //editor.putString("username",UserDetails.getInstance().userName);
+            //editor.commit();
+
             UserDetails.getInstance().userId = sp.getString("userId","0");
+            UserDetails.getInstance().providerId = sp.getString("userId","0");
+            UserDetails.getInstance().consumerId= sp.getString("userId","0");
+
             String userType = sp.getString("userType","guest");
+            UserDetails.getInstance().userName = sp.getString("username","guest");
+
+
+
             if (userType.equals("provider")) {
+
                 startActivity(new Intent(this, ProviderHome.class));
+
             } else {
                 startActivity(new Intent(this, ConsumerHome.class));
+
             }
             finish();
         }
@@ -122,26 +134,24 @@ public class Login extends AppCompatActivity {
                 if(color == Color.WHITE){
                     isProvider = true;
                 }
+                else{
+                    isProvider = false;
+                }
                 if (mobileNo.getText().toString().length() == 0 || password.getText().toString().length() == 0) {
                     if (mobileNo.length() == 0) {
-                        Toast.makeText(Login.this, "Please anim_slide_in_right your mobile no", Toast.LENGTH_LONG).show();
+                        Toast.makeText(Login.this, "Please enter your mobile no", Toast.LENGTH_LONG).show();
                     } else if (password.length() == 0) {
-                        Toast.makeText(Login.this, "Please anim_slide_in_right your password", Toast.LENGTH_LONG).show();
+                        Toast.makeText(Login.this, "Please enter your password", Toast.LENGTH_LONG).show();
                     }
                 } else {
                     loginClicked();
-                    if (logInSuccessful) {
-
-                    } else {
-                        Toast.makeText(Login.this, "Sorry invalid username or password. Please try again.", Toast.LENGTH_LONG);
-                    }
                 }
             }
         });
     }
 
     public void loginClicked() {
-        String url = "http://192.168.109.41/login.php";
+        String url = UserDetails.getInstance().url+"login.php";
         com.android.volley.RequestQueue queue = Volley.newRequestQueue(this);
         pDialog = new ProgressDialog(this);
         pDialog.setMessage("Logging in...");
@@ -150,8 +160,8 @@ public class Login extends AppCompatActivity {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        pDialog.dismiss();
-                        Log.d("login response", response);
+                        pDialog.hide();
+                        Log.d("login_response", response);
                         try {
                             JSONArray jsonArray = new JSONArray(response);
                             if(jsonArray.length() == 0){
@@ -202,12 +212,33 @@ public class Login extends AppCompatActivity {
                                         userType = "consumer";
                                     }
                                     logInSuccessful = true;
-                                    Toast.makeText(Login.this, "Login credentials correct" + UserDetails.getInstance().consumerId, Toast.LENGTH_LONG).show();
+                                   // Toast.makeText(Login.this, "Login credentials correct" + UserDetails.getInstance().consumerId, Toast.LENGTH_LONG).show();
                                     editor.putBoolean("loggedin", true);
                                     editor.commit();
                                     if (userType.equals("provider")) {
                                         editor.putString("userType", "provider");
                                         editor.commit();
+
+                            ///////Take provider to fill account details is user is new
+                                        Intent previousIntent = getIntent();
+                                        //Log.d("LoginProvider",previousIntent.getStringExtra("isNewUser").equals("true")+"");
+                                        try {
+                                            if (previousIntent.getStringExtra("isNewUser").equals("true")) {
+                                                Log.d("LoginProvider", "entered");
+                                                Intent intent = new Intent(Login.this,ProviderHome.class);
+                                                intent.putExtra("isNewUser","true");
+                                                startActivity(intent);
+                                                Log.d("LoginProvider", "finish about to call and moving to Account Settings");
+                                                finish();
+                                            }
+                                            else
+                                                Log.d("LoginProvider","Problem");
+
+                                        }
+                                        catch (Exception e){
+                                            e.printStackTrace();
+                                        }
+                                        Log.d("LoginProvider","ProviderHomeCalling");
                                         startActivity(new Intent(Login.this, ProviderHome.class));
                                     } else {
                                         editor.putString("userType", "consumer");
@@ -219,6 +250,7 @@ public class Login extends AppCompatActivity {
                             }
                         } catch (Exception e) {
                             Log.d("login json error", e.getMessage());
+                            Toast.makeText(Login.this,"error please try again",Toast.LENGTH_SHORT).show();
                         }
                     }
                 },
@@ -235,6 +267,7 @@ public class Login extends AppCompatActivity {
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<>();
                 params.put("user_type", (isProvider)? "provider" : "consumer");
+                Log.d("loginType", isProvider+"");
                 params.put("mobile_no", mobileNo.getText().toString());
                 params.put("password", password.getText().toString());
                 return params;
