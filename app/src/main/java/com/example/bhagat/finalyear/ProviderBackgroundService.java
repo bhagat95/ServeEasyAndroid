@@ -62,7 +62,7 @@ public class ProviderBackgroundService extends Service {
     public void generateNotifications(String categoryName, String consumerName, String quantity){
         //Build the notification
         int requestCount = 2;
-        notification.setSmallIcon(R.drawable.person);
+        notification.setSmallIcon(R.drawable.serve_easy_logo);
         notification.setTicker("New request");
         notification.setWhen(System.currentTimeMillis());
         notification.setContentTitle(categoryName);

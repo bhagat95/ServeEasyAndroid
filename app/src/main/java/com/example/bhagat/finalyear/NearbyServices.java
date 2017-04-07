@@ -108,13 +108,14 @@ public class NearbyServices extends Fragment implements ActivityCompat.OnRequest
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
         if ( ContextCompat.checkSelfPermission( getActivity(), Manifest.permission.ACCESS_FINE_LOCATION ) == PackageManager.PERMISSION_GRANTED ) {
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
-            getServices();
+
             Location location = locationManager.getLastKnownLocation(locationManager.getBestProvider(new Criteria(), true));
             if (location != null) {
                 onLocationChanged(location);
             }
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME, MIN_DISTANCE,
                     locationListener );
+            getServices();
         }
         else{
             if (ContextCompat.checkSelfPermission(getActivity(),

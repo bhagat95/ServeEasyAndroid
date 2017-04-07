@@ -69,7 +69,7 @@ public class ConsumerHome extends AppCompatActivity{
         String username = sharedPreferences.getString("username","User");
         View header = (navigationView.getHeaderView(0));
         welcome = (TextView)header.findViewById(R.id.welcomehead);
-        welcome.setText("Welcome " + username +"!");
+        welcome.setText(username);
 
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
 

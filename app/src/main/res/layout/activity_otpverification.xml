@@ -15,7 +15,7 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginBottom="25dp"
             android:layout_marginTop="100dp"
-            android:src="@mipmap/ic_launcher" />
+            android:src="@drawable/serve_easy_logo" />
 
         <TextView
             android:layout_width="fill_parent"

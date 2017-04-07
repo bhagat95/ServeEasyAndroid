@@ -58,7 +58,7 @@ public class ConsumerBackgroundService extends Service {
 
     public void generateAcceptedNotifications(String categoryName, String consumerName, String quantity){
         //Build the notification
-        notification.setSmallIcon(R.drawable.person);
+        notification.setSmallIcon(R.drawable.serve_easy_logo);
         notification.setTicker("New request");
         notification.setWhen(System.currentTimeMillis());
 
@@ -79,7 +79,7 @@ public class ConsumerBackgroundService extends Service {
 
     public void generateCancelledNotifications(String categoryName, String consumerName, String quantity){
         //Build the notification
-        notification.setSmallIcon(R.drawable.person);
+        notification.setSmallIcon(R.drawable.serve_easy_logo);
         notification.setTicker("New request");
         notification.setWhen(System.currentTimeMillis());
         Uri sound = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.freeze_sound);

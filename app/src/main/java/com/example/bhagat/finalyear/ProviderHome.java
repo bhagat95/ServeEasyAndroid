@@ -115,7 +115,7 @@ public class ProviderHome extends AppCompatActivity {
 
 
         welcome = (TextView)header.findViewById(R.id.welcomehead);
-        welcome.setText("Welcome " + username +"!");
+        welcome.setText(username);
 
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
