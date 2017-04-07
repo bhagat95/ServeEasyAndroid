@@ -102,7 +102,7 @@ public class VolleyNetworkManager {
                         String message = null;
                         if (volleyError instanceof NetworkError) {
                             message = "Cannot connect to Internet...Please check your connection!";
-                        } else if (volleyError instanceof ServerError) {
+                            } else if (volleyError instanceof ServerError) {
                             message = "The server could not be found. Please try again after some time!!";
                         } else if (volleyError instanceof AuthFailureError) {
                             message = "Cannot connect to Internet...Please check your connection!";
