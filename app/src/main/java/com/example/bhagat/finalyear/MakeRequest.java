@@ -150,7 +150,7 @@ public class MakeRequest extends AppCompatActivity {
             }
         });
     }
-
+// For android 6.0 and above
     public  boolean isPermissionGranted() {
         if (Build.VERSION.SDK_INT >= 23) {
             if (checkSelfPermission(android.Manifest.permission.CALL_PHONE)
