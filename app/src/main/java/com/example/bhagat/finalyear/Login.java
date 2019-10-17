@@ -101,11 +101,13 @@ public class Login extends AppCompatActivity {
 
 
 
-        /*This is used to keep the user logged in when the next time the user opens the app*/
+        //This is used to keep the user logged in when the next time the user opens the app
+        //We will switch to using KeyChain in future instead of SharedPreferences, to store credentials
+        
         if (loggdedIn) {
             //editor.putString("username",UserDetails.getInstance().userName);
             //editor.commit();
-
+            
             UserDetails.getInstance().userId = sp.getString("userId","0");
             UserDetails.getInstance().providerId = sp.getString("userId","0");
             UserDetails.getInstance().consumerId= sp.getString("userId","0");
