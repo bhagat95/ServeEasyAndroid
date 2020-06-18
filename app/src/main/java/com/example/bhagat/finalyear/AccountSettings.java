@@ -336,10 +336,11 @@ public class AccountSettings extends Fragment implements ActivityCompat.OnReques
         latitude = location.getLatitude();
         Log.d("Latitude", latitude + " ");
     }
-
+    
+    //default methods
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
-
+        
     }
 
     @Override
@@ -349,6 +350,6 @@ public class AccountSettings extends Fragment implements ActivityCompat.OnReques
 
     @Override
     public void onProviderDisabled(String provider) {
-
+        
     }
 }
